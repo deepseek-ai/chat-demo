@@ -1,0 +1,12 @@
+.frame {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  overflow: hidden;
+}
+
+.main {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
