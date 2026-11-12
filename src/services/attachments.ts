@@ -85,7 +85,7 @@ const enqueueUpload = (apiKey: string, file: Blob, name: string, signal: AbortSi
       try {
         const body = file instanceof File ? file : new File([file], name, { type: file.type })
         // 图片不传 purpose，其他文件需要服务端做版面解析
-        const purpose = isImage(resolveMimeType(body)) ? null : 'rich_layout_extraction'
+        const purpose = isImage(resolveMimeType(body)) ? null : 'rich_layout_recognition'
         resolve((await uploadFile(apiKey, body, purpose, signal)).id)
       } catch (error) {
         reject(error)

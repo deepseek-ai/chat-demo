@@ -94,7 +94,7 @@ export const verifyApiKey = async (apiKey: string, signal?: AbortSignal): Promis
 
 /**
  * POST /anthropic/v1/files 上传附件（不设过期时间，会话里的历史附件一直可用）。
- * purpose 为 null 时不传该字段（图片）。
+ * purpose 为 null 时不传该字段（图片）；rich_layout_recognition 要求它排在 file 之前。
  */
 export const uploadFile = async (
   apiKey: string,
@@ -103,10 +103,10 @@ export const uploadFile = async (
   signal?: AbortSignal
 ): Promise<FileObject> => {
   const form = new FormData()
-  form.append('file', file)
   if (purpose) {
     form.append('purpose', purpose)
   }
+  form.append('file', file)
   const response = await request(`${ANTHROPIC_BASE_URL}/files`, {
     method: 'POST',
     headers: anthropicHeaders(apiKey, true),

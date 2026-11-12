@@ -227,7 +227,7 @@ export type MessageStreamEvent =
   | { type: 'ping' }
 
 /** POST /anthropic/v1/files 的 purpose：非图片文件需要服务端做版面解析 */
-export type FilePurpose = 'rich_layout_extraction'
+export type FilePurpose = 'rich_layout_recognition'
 
 /** POST /anthropic/v1/files 的响应 */
 export type FileObject = {
