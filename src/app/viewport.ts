@@ -10,7 +10,7 @@ const subscribe = (onChange: () => void) => {
 
 export const useIsMobile = () => useSyncExternalStore(subscribe, () => query.matches)
 
-/** 仅会话页跟随视觉视口；首页交给浏览器布局，避免键盘滚动时反复补偿引起抖动。 */
+/** 移动端页面跟随视觉视口，键盘弹出后顶栏和输入框仍留在可见区域。 */
 export const useMobileViewport = (enabled: boolean) => {
   const frameRef = useRef<HTMLDivElement>(null)
 

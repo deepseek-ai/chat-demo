@@ -1,4 +1,3 @@
-import clsx from 'clsx'
 import { useEffect } from 'react'
 import { useSettings } from '../services/settings.js'
 import { useIsMobile, useMobileViewport } from './viewport.js'
@@ -26,8 +25,7 @@ export const App = () => {
   const session = useChatStore((state) =>
     state.activeId === null ? null : state.sessions.find(({ id }) => id === state.activeId)
   )
-  const mobileSession = isMobile && Boolean(session)
-  const frameRef = useMobileViewport(mobileSession)
+  const frameRef = useMobileViewport(isMobile)
   const streaming = useChatStore((state) =>
     state.activeId === null ? false : state.activeId in state.streaming
   )
@@ -80,7 +78,7 @@ export const App = () => {
 
   return (
     <>
-      <div ref={frameRef} className={clsx(styles.frame, mobileSession && styles.mobileSession)}>
+      <div ref={frameRef} className={styles.frame}>
         {isMobile ? <MobileSider /> : siderCollapsed ? null : <Sider />}
         <main className={styles.main}>
           {siderCollapsed ? <CollapsedSider /> : null}
