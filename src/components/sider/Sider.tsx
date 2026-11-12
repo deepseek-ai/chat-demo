@@ -101,13 +101,16 @@ export const Sider = ({ mobile = false }: { mobile?: boolean }) => {
   )
 }
 
-/** 移动端抽屉：浮在页面上方，点遮罩关闭 */
+/** 移动端抽屉：浮在页面上方，点空白区域关闭。 */
 export const MobileSider = () => {
   const open = useMobileSider((state) => state.open)
+  if (!open) {
+    return null
+  }
   return (
     <>
-      {open ? <div className={styles.drawerMask} onClick={closeMobileSider} /> : null}
-      <div className={clsx(styles.drawer, open && styles.drawerOpen)}>
+      <div className={styles.drawerMask} onClick={closeMobileSider} />
+      <div className={styles.drawer}>
         <Sider mobile />
       </div>
     </>

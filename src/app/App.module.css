@@ -3,6 +3,7 @@
   inset: 0;
   display: flex;
   overflow: hidden;
+  background-color: var(--dsw-alias-bg-base);
 }
 
 .main {

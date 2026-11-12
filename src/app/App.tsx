@@ -2,7 +2,6 @@ import clsx from 'clsx'
 import { useEffect } from 'react'
 import { useSettings } from '../services/settings.js'
 import { useIsMobile, useMobileViewport } from './viewport.js'
-import { useMobileScrollLock } from './useMobileScrollLock.js'
 import { reportStorageError } from '../services/chat/db.js'
 import { initChat, useChatStore } from '../services/chat/store.js'
 import { SearchPanel } from '../components/search/SearchPanel.js'
@@ -20,7 +19,6 @@ import styles from './App.module.css'
 
 export const App = () => {
   const isMobile = useIsMobile()
-  useMobileScrollLock(isMobile)
   const locale = useSettings((state) => state.locale)
   // 移动端侧边栏以独立抽屉管理开合状态
   const siderCollapsed = useSettings((state) => state.siderCollapsed) && !isMobile
@@ -34,6 +32,34 @@ export const App = () => {
     state.activeId === null ? false : state.activeId in state.streaming
   )
   const activeId = useChatStore((state) => state.activeId)
+
+  useEffect(() => {
+    if (!isMobile) {
+      return
+    }
+    const preventPageScroll = (event: TouchEvent) => {
+      if (event.touches.length !== 1) {
+        return
+      }
+      for (
+        let element = event.target instanceof Element ? event.target : null;
+        element && element !== document.body;
+        element = element.parentElement
+      ) {
+        const style = getComputedStyle(element)
+        const scrollsY =
+          /auto|scroll/.test(style.overflowY) && element.scrollHeight > element.clientHeight
+        const scrollsX =
+          /auto|scroll/.test(style.overflowX) && element.scrollWidth > element.clientWidth
+        if (scrollsY || scrollsX) {
+          return
+        }
+      }
+      event.preventDefault()
+    }
+    document.addEventListener('touchmove', preventPageScroll, { passive: false })
+    return () => document.removeEventListener('touchmove', preventPageScroll)
+  }, [isMobile])
 
   useEffect(() => {
     document.documentElement.lang = locale
