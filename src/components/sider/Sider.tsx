@@ -106,10 +106,7 @@ export const MobileSider = () => {
   const open = useMobileSider((state) => state.open)
   return (
     <>
-      <div
-        className={clsx(styles.drawerMask, open && styles.drawerMaskVisible)}
-        onClick={closeMobileSider}
-      />
+      {open ? <div className={styles.drawerMask} onClick={closeMobileSider} /> : null}
       <div className={clsx(styles.drawer, open && styles.drawerOpen)}>
         <Sider mobile />
       </div>

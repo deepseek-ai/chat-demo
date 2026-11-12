@@ -22,7 +22,13 @@ export const useTheme = (): Theme => {
   return resolveTheme(preference, osTheme)
 }
 
-/** 在 body 上切换 class 与 data-ds-dark-theme */
+const syncPageBackground = () => {
+  const backgroundColor = getComputedStyle(document.body).backgroundColor
+  document.documentElement.style.backgroundColor = backgroundColor
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', backgroundColor)
+}
+
+/** 同步页面主题、根画布背景和支持 theme-color 的浏览器栏。 */
 const applyTheme = (theme: Theme) => {
   const body = document.body
   // 切换的这一帧关掉过渡，避免各处颜色按各自的 transition 先后变化
@@ -33,6 +39,11 @@ const applyTheme = (theme: Theme) => {
     body.setAttribute('data-ds-dark-theme', 'dark')
   } else {
     body.removeAttribute('data-ds-dark-theme')
+  }
+  document.documentElement.style.colorScheme = theme
+  // WebKit 可能先执行 defer 脚本、后加载其后的样式表；首次读取颜色要等样式就绪。
+  if (document.readyState === 'complete') {
+    syncPageBackground()
   }
   setTimeout(() => {
     body.classList.remove('change-theme')
@@ -52,6 +63,9 @@ const syncTheme = () => {
 /** 首屏渲染前同步应用一次，之后随主题设置与系统深浅色变化更新 */
 export const setupTheme = () => {
   syncTheme()
+  if (document.readyState !== 'complete') {
+    window.addEventListener('load', syncPageBackground, { once: true })
+  }
   query.addEventListener('change', syncTheme)
   useSettings.subscribe(syncTheme)
 }
