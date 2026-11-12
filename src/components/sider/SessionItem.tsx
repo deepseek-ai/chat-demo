@@ -56,7 +56,6 @@ export const SessionItem = memo(function SessionItem({
       }}
     >
       <div className={styles.title}>{displayTitle}</div>
-      <div className={styles.mask} />
       <div className={styles.action} onClick={(event) => event.stopPropagation()}>
         <Menu
           options={[

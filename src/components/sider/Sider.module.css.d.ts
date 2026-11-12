@@ -8,7 +8,6 @@ declare const styles: {
   readonly "list": string;
   readonly "section": string;
   readonly "sectionHeader": string;
-  readonly "gradientMask": string;
   readonly "bottom": string;
   readonly "settings": string;
   readonly "settingsIcon": string;

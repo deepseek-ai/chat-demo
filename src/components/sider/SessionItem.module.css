@@ -1,5 +1,4 @@
 .item {
-  --mask-base-color: 241, 243, 245;
   position: relative;
   display: flex;
   align-items: center;
@@ -13,7 +12,6 @@
   cursor: pointer;
 
   &.active {
-    --mask-base-color: 228, 237, 253;
     background-color: var(--dsw-specific-sidebar-nav-item-active-accent);
     color: var(--dsw-alias-brand-primary-invert);
   }
@@ -25,23 +23,15 @@
 
     &:hover,
     &.active {
-      .mask,
       .action {
         display: flex;
       }
     }
   }
-
-  [data-ds-dark-theme] & {
-    --mask-base-color: 44, 44, 46;
-
-    &.active {
-      --mask-base-color: 53, 54, 56;
-    }
-  }
 }
 
 .title {
+  flex: 1;
   min-width: 0;
   overflow: hidden;
   white-space: nowrap;
@@ -49,28 +39,10 @@
   line-height: 18px;
 }
 
-.mask {
-  display: none;
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 56px;
-  border-radius: 0 12px 12px 0;
-  pointer-events: none;
-  background: linear-gradient(
-    90deg,
-    rgba(var(--mask-base-color), 0) 0%,
-    rgba(var(--mask-base-color), 0.5) 20.23%,
-    rgb(var(--mask-base-color)) 40.62%
-  );
-}
-
 .action {
   display: none;
-  position: absolute;
-  right: 4px;
-  z-index: 10;
+  flex-shrink: 0;
+  margin-left: 4px;
 }
 
 .renameInput {
@@ -88,7 +60,6 @@
 }
 
 @media (hover: none) {
-  .mask,
   .action {
     display: flex;
   }
@@ -104,10 +75,6 @@
 
   .title {
     line-height: 22px;
-  }
-
-  .mask {
-    border-radius: 0 16px 16px 0;
   }
 
   .renameInput {

@@ -63,7 +63,6 @@ export const Sider = ({ mobile = false }: { mobile?: boolean }) => {
             </div>
           ))}
         </div>
-        <div className={styles.gradientMask} />
       </div>
       <div className={styles.bottom}>
         <button type="button" className={styles.settings} onClick={() => openSettings('general')}>
