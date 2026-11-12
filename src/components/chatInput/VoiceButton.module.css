@@ -14,8 +14,14 @@
   outline: none;
   transition: background-color var(--ds-transition-duration) var(--ds-ease-in-out);
 
-  &:hover:not(.disabled) {
+  &:active:not(.recording):not(.disabled) {
     background-color: var(--dsw-alias-interactive-bg-hover);
+  }
+
+  @media (hover: hover) {
+    &:hover:not(.recording):not(.disabled) {
+      background-color: var(--dsw-alias-interactive-bg-hover);
+    }
   }
 
   &:focus-visible {
@@ -26,10 +32,6 @@
 .disabled {
   color: var(--dsw-alias-label-caption);
   cursor: not-allowed;
-}
-
-.recording:hover {
-  background-color: transparent;
 }
 
 .active {

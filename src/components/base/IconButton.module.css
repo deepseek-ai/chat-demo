@@ -12,8 +12,14 @@
   transition: background-color var(--ds-transition-duration) var(--ds-ease-in-out);
   outline: none;
 
-  &:hover:not(:disabled) {
+  &:active:not(:disabled) {
     background-color: var(--dsw-alias-interactive-bg-hover);
+  }
+
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      background-color: var(--dsw-alias-interactive-bg-hover);
+    }
   }
 
   &:focus-visible {
