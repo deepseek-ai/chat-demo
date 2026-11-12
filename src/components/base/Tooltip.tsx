@@ -25,7 +25,7 @@ export const Tooltip = ({
   const { open, setOpen, schedule, cancel } = useDelayedOpen()
   const { anchorRef, floatingRef, position } = useAnchoredPosition<HTMLSpanElement, HTMLDivElement>(
     open,
-    { side: placement, align: 'center', measureFirstChild: true }
+    { side: placement, align: 'center', measureFirstChild: true, measureKey: content }
   )
 
   useEffect(() => () => cancel(), [cancel])

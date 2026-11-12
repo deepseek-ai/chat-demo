@@ -42,6 +42,11 @@ export type AnchoredOptions = {
    * （如 display: contents），它的 getBoundingClientRect 是空矩形。
    */
   measureFirstChild?: boolean
+  /**
+   * 浮层内容标识，变化时在绘制前同步重新测量。内容变化交给 ResizeObserver 会先按
+   * 旧位置绘制一帧再回弹，所以需要这个同步入口。
+   */
+  measureKey?: unknown
 }
 
 const clampLeft = (left: number, width: number) =>
@@ -87,6 +92,7 @@ export const useAnchoredPosition = <T extends HTMLElement, F extends HTMLElement
     maxHeight,
     minSpace = 160,
     measureFirstChild = false,
+    measureKey,
   }: AnchoredOptions = {}
 ) => {
   const anchorRef = useRef<T | null>(null) as MutableRefObject<T | null>
@@ -150,15 +156,21 @@ export const useAnchoredPosition = <T extends HTMLElement, F extends HTMLElement
     })
   }, [align, alignOffset, applyPosition, floatingRef, getAnchor, maxHeight, minSpace, offset, side])
 
+  // 打开时与内容变化时同步测量，必须在绘制前完成
+  useLayoutEffect(() => {
+    if (open) {
+      update()
+    }
+  }, [measureKey, open, update])
+
   /*
-   * 打开期间持续跟踪位置来源：浮层或触发元素尺寸变化（如提示文案在多个状态间切换）、
-   * 窗口尺寸变化、任意滚动容器滚动。对应 @floating-ui 的 autoUpdate，避免浮层停在旧位置。
+   * 打开期间跟踪渲染时无法预知的位置来源：浮层或触发元素尺寸变化、窗口尺寸变化、
+   * 任意滚动容器滚动。对应 @floating-ui 的 autoUpdate，避免浮层停在旧位置。
    */
   useLayoutEffect(() => {
     if (!open) {
       return
     }
-    update()
     const floating = floatingRef.current
     if (!floating) {
       return
