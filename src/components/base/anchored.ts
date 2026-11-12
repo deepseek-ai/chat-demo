@@ -93,11 +93,31 @@ export const useAnchoredPosition = <T extends HTMLElement, F extends HTMLElement
   const floatingRef = useRef<F | null>(null) as MutableRefObject<F | null>
   const [position, setPosition] = useState<AnchoredPosition | null>(null)
 
+  /** 位置没有实际变化时不更新状态，避免重新测量引起多余渲染 */
+  const applyPosition = useCallback((next: AnchoredPosition) => {
+    setPosition((previous) =>
+      previous &&
+      previous.top === next.top &&
+      previous.left === next.left &&
+      previous.right === next.right &&
+      previous.maxHeight === next.maxHeight
+        ? previous
+        : next
+    )
+  }, [])
+
+  /** 触发元素自身不产生盒子时（如 display: contents），用它第一个子元素测量 */
+  const getAnchor = useCallback(
+    () =>
+      measureFirstChild
+        ? (anchorRef.current?.firstElementChild as HTMLElement | null)
+        : anchorRef.current,
+    [anchorRef, measureFirstChild]
+  )
+
   // 测量只在浮层打开且已挂载后进行，ref 对象稳定，回调不随渲染重建
   const update = useCallback(() => {
-    const anchor = measureFirstChild
-      ? (anchorRef.current?.firstElementChild as HTMLElement | null)
-      : anchorRef.current
+    const anchor = getAnchor()
     const floating = floatingRef.current
     if (!anchor || !floating) {
       return
@@ -109,7 +129,7 @@ export const useAnchoredPosition = <T extends HTMLElement, F extends HTMLElement
     if (maxHeight === undefined) {
       const { width, height } = floating.getBoundingClientRect()
       const resolved = resolveSide(spaceAbove, spaceBelow, side, height)
-      setPosition({
+      applyPosition({
         top: resolved === 'top' ? rect.top - offset - height : rect.bottom + offset,
         left: alignLeft(rect, width, align, alignOffset),
       })
@@ -120,7 +140,7 @@ export const useAnchoredPosition = <T extends HTMLElement, F extends HTMLElement
     const available = Math.max(0, resolved === 'top' ? spaceAbove : spaceBelow)
     // 内容比可用空间小时按内容收口，避免浮层留出多余空白
     const height = Math.max(40, Math.min(maxHeight, available, floating.scrollHeight + 2))
-    setPosition({
+    applyPosition({
       top:
         resolved === 'top'
           ? Math.max(VIEWPORT_PADDING, rect.top - offset - height)
@@ -128,14 +148,35 @@ export const useAnchoredPosition = <T extends HTMLElement, F extends HTMLElement
       right: Math.max(VIEWPORT_PADDING, window.innerWidth - rect.right),
       maxHeight: height,
     })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [align, alignOffset, maxHeight, measureFirstChild, minSpace, offset, side])
+  }, [align, alignOffset, applyPosition, floatingRef, getAnchor, maxHeight, minSpace, offset, side])
 
+  /*
+   * 打开期间持续跟踪位置来源：浮层或触发元素尺寸变化（如提示文案在多个状态间切换）、
+   * 窗口尺寸变化、任意滚动容器滚动。对应 @floating-ui 的 autoUpdate，避免浮层停在旧位置。
+   */
   useLayoutEffect(() => {
-    if (open) {
-      update()
+    if (!open) {
+      return
     }
-  }, [open, update])
+    update()
+    const floating = floatingRef.current
+    if (!floating) {
+      return
+    }
+    const anchor = getAnchor()
+    const observer = new ResizeObserver(() => update())
+    observer.observe(floating)
+    if (anchor) {
+      observer.observe(anchor)
+    }
+    window.addEventListener('scroll', update, { capture: true, passive: true })
+    window.addEventListener('resize', update, { passive: true })
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('scroll', update, { capture: true })
+      window.removeEventListener('resize', update)
+    }
+  }, [floatingRef, getAnchor, open, update])
 
   useEffect(() => {
     if (!open) {
