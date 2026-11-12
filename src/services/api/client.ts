@@ -8,7 +8,7 @@ import type {
   MessageStreamEvent,
 } from './types.js'
 
-/** 构建期常量，默认 https://api.deepseek.com；本地开发可在构建配置中改为经开发服务器代理 */
+/** 构建期 API 地址，默认 https://api.deepseek.com；本地开发支持开发服务器代理 */
 export const API_ORIGIN = __API_ORIGIN__
 /** Anthropic 兼容接口的前缀 */
 const ANTHROPIC_BASE_URL = `${API_ORIGIN}/anthropic/v1`
@@ -56,7 +56,7 @@ const readErrorResponse = async (response: Response): Promise<ApiError> => {
       message = body.error.message
     }
   } catch {
-    // 响应体不是 JSON 时直接展示原文
+    // 非 JSON 响应体直接展示原文
   }
   return new ApiError('http', message, response.status)
 }

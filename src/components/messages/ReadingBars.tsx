@@ -1,19 +1,12 @@
 /**
  * 朗读按钮 loading / playing 两态的动画竖条（4 根，SVG 绘制，随 mode 换动画与颜色）。
  *
- * playing 波形用 SMIL 动 rect 的 height+y，不要改成 CSS 动画：
- * - div 动 height：paint 时边缘按设备像素取整，慢速动画呈階跃抖动，引擎行为无参可调；
- * - div 动 scaleY：平滑但 1px 圆角端头被纵向压扁；
- * - rect 几何走 CSS 属性要 Safari 17.4，SMIL 则 iOS6+ 可用（项目底线 iOS12）。
- * 代价：SMIL 逐帧走主线程（16×16 可忽略），且不认 prefers-reduced-motion——JSX 用
- * matchMedia 渲染静态帧。波形只取两段极值 keyframe：中间设档会因逐段 easing 在
- * 中点停顿，真正弦中点速度最大。
+ * playing 波形通过 SMIL 同步改变 rect 的 height 与 y，保持圆角形状和竖直居中。
+ * 两个高度极值之间使用 ease-in-out 插值；prefers-reduced-motion 启用时显示静态帧。
  *
- * 引擎怪癖要求 svg 两态常驻、切态勿重挂（勿加 key）：
- * - Chromium 新建 SMIL 时间容器约 400ms 不推进时间轴（setCurrentTime/pause 救不回）；
- *   常驻使冻结落在 loading 期，切态往运行中的容器插 <animate>，10ms 内起波；
- * - 新版 WebKit 容器不自启，挂载时须 unpauseAnimations() 踢一脚。
- * 入场相位因此取决于容器时间落点，错峰关系由 begin 差值保证。
+ * SVG 在两种状态间保持挂载，使 SMIL 时间轴连续运行，涵盖 Chromium 的容器启动延迟。
+ * 挂载时调用 unpauseAnimations()，确保 WebKit 中的动画时间轴启动。
+ * 入场相位取决于容器当前时间，相邻竖条的相位差由 begin 决定。
  */
 
 import { Fragment, useEffect, useRef, useState } from 'react'
@@ -42,8 +35,7 @@ export function ReadingBars({ mode }: { mode: 'loading' | 'playing' }) {
 
   const svgRef = useRef<SVGSVGElement>(null)
   useEffect(() => {
-    // 新版 WebKit 的 SMIL 容器创建后不自启（时钟停在 0，症状是 playing 条全高静止），
-    // 踢一脚才跑；Chromium 与旧 WebKit（iOS12）自启，此调用为无害 no-op。
+    // 显式启动 SMIL 时间轴，支持容器初始处于暂停状态的 WebKit。
     svgRef.current?.unpauseAnimations()
   }, [])
 
@@ -113,7 +105,7 @@ function usePrefersReducedMotion() {
   useEffect(() => {
     const queryList = window.matchMedia(REDUCED_MOTION_QUERY)
     const listener = ({ matches }: { matches: boolean }) => setReduced(matches)
-    // 要用老字号 API：iOS12 的 MediaQueryList 没有 addEventListener
+    // addListener 支持 iOS 12 的 MediaQueryList。
     queryList.addListener(listener)
     return () => queryList.removeListener(listener)
   }, [])

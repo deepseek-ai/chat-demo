@@ -1,9 +1,8 @@
 /**
  * 录音并编码为 ASR 接受的 WAV（单声道、16-bit PCM、16kHz）。
  *
- * 浏览器的 MediaRecorder 只能产出 webm / mp4，ASR 不接受，因此直接采集 PCM：
- * AudioContext 以 16kHz 创建，浏览器负责重采样；用 ScriptProcessorNode 取样本，
- * 不用 AudioWorklet，因为后者要以模块地址加载处理脚本，file:// 下无法保证可用。
+ * AudioContext 以 16kHz 创建，浏览器负责重采样；ScriptProcessorNode 采集 PCM 样本。
+ * 录音处理在页面内完成。
  */
 export const SAMPLE_RATE = 16000
 /** ASR 单次时长上限 120 秒 */
@@ -28,7 +27,7 @@ export const startRecording = async (onLimit: () => void): Promise<Recording> =>
   const context = new AudioContext({ sampleRate: SAMPLE_RATE })
   const source = context.createMediaStreamSource(stream)
   const processor = context.createScriptProcessor(BUFFER_SIZE, 1, 1)
-  // 音量单独用 AnalyserNode 读取：ScriptProcessor 的回调间隔 256ms，驱动动画太粗
+  // AnalyserNode 按动画帧提供音量数据，驱动录音动画
   const analyser = context.createAnalyser()
   analyser.fftSize = 512
   const levelBuffer = new Float32Array(analyser.fftSize)

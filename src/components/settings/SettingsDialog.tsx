@@ -245,7 +245,7 @@ const themeOptions: { value: ThemePreference; label: TranslationKey; icon: React
 
 /**
  * 主题项：标题下方浅色 / 深色 / 跟随系统三个选块。
- * 不算设置项，和下方语言之间没有分隔线
+ * 与下方语言选项连续排列。
  */
 const ThemeSetting = () => {
   const t = useTranslate()
@@ -393,7 +393,7 @@ const ImportHistory = ({
   )
 }
 
-/** 导出全部会话及图片为原版格式的 ZIP 文件，直接下载 */
+/** 将全部会话及图片导出为 ZIP 文件并下载 */
 const ExportHistory = () => {
   const t = useTranslate()
   const empty = useChatStore((state) => state.sessions.length === 0)

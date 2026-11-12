@@ -30,7 +30,7 @@ export const Tooltip = ({
 
   useEffect(() => () => cancel(), [cancel])
 
-  // 不跟随滚动重新定位，滚动时直接收起
+  // 滚动时收起提示。
   useEffect(() => {
     if (!open) {
       return

@@ -15,11 +15,11 @@ const cssLoader = {
 type ConfigOptions = {
   /** 公开 API 的地址，注入为 __API_ORIGIN__ */
   apiOrigin?: string
-  /** 合并进 devServer，用于本地调试时代理接口 */
+  /** 开发服务器配置，支持本地接口代理 */
   devServer?: Configuration['devServer']
 }
 
-/** 本地可在不入库的配置文件中调用它，改写接口地址与开发服务器代理 */
+/** 创建构建配置，支持自定义 API 地址和开发服务器选项 */
 export const createConfig = ({
   apiOrigin = 'https://api.deepseek.com',
   devServer,
@@ -38,15 +38,15 @@ export const createConfig = ({
     clean: true,
   },
   devtool: dev ? 'cheap-module-source-map' : false,
-  // 开发时按需编译异步模块会在首次加载代码高亮、公式时整页刷新，关掉以保持页面状态
+  // 开发模式预编译异步模块，保持首次加载代码高亮和公式时的页面状态
   lazyCompilation: false,
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
-    // 源码按 NodeNext 习惯写 `./x.js`，指向同名 .ts / .tsx
+    // 将 .js 导入路径解析到同名 .ts、.tsx 或 .js 文件
     extensionAlias: { '.js': ['.ts', '.tsx', '.js'] },
   },
   module: {
-    // 与主站一致使用 `import styles from './x.module.css'`
+    // CSS Modules 使用默认导出：`import styles from './x.module.css'`
     parser: { 'css/module': { namedExports: false } },
     generator: { 'css/module': { localIdentName: '[local]-[hash:6]' } },
     rules: [
@@ -70,7 +70,7 @@ export const createConfig = ({
     ],
   },
   plugins: [
-    // 普通 defer 脚本：file:// 页面的 origin 为 null，type="module" 脚本会被跨域策略拦截
+    // 经典 defer 脚本支持 file:// 页面的资源加载
     new rspack.HtmlRspackPlugin({ template: './src/index.html', scriptLoading: 'defer' }),
     new rspack.DefinePlugin({ __API_ORIGIN__: JSON.stringify(apiOrigin) }),
     new rspack.CopyRspackPlugin({

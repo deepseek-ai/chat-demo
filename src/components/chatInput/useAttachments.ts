@@ -30,7 +30,7 @@ export const useAttachmentTask = (id: string): UploadTask =>
 
 /**
  * 输入框里待发送的文件：选中即开始上传到 Files API。
- * 上传中可发送：不必等上传完成，发送后消息先上屏，请求在附件就绪后发出；
+ * 上传中可发送：消息立即显示，请求在附件就绪后发出；
  * 上传失败的附件需要先重试或删除。
  */
 export const useAttachments = () => {
@@ -72,7 +72,7 @@ export const useAttachments = () => {
     [upload]
   )
 
-  /** 删除：取消进行中的上传；已上传的远端文件不删（与删除会话一致，见 removeSession） */
+  /** 删除附件时取消进行中的上传，保留已上传的远端文件 */
   const remove = (item: Attachment) => {
     cancelUpload(item.id)
     if (item.previewUrl) {

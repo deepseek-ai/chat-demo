@@ -5,7 +5,7 @@ import { SourceCard } from './SourceCard.js'
 
 /**
  * 正文里 [citation:N] 的数字角标：悬停预览来源，点击新标签打开。
- * 不用 <a>，角标落在链接文字里时不会嵌套链接。样式由 .ds-markdown-cite 提供。
+ * 角标使用带 link 角色的 span，可嵌入链接文字。样式由 .ds-markdown-cite 提供。
  */
 export const CitationLink = ({ source }: { source: Source }) => {
   const open = (event: MouseEvent<HTMLElement>) => {

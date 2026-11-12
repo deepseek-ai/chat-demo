@@ -1,4 +1,3 @@
-/** ic_ds_check_outline_16 */
 export const IconCheckOutline16 = () => (
   <svg width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -8,7 +7,6 @@ export const IconCheckOutline16 = () => (
   </svg>
 )
 
-/** ic_ds_chevron_down_outline_14 */
 export const IconChevronDownOutline14 = () => (
   <svg width={14} height={14} viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -18,7 +16,6 @@ export const IconChevronDownOutline14 = () => (
   </svg>
 )
 
-/** ic_ds_chevron_right_outline_14 */
 export const IconChevronRightOutline14 = () => (
   <svg width={14} height={14} viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -28,7 +25,6 @@ export const IconChevronRightOutline14 = () => (
   </svg>
 )
 
-/** ic_ds_close_fill_14 */
 export const IconCloseFill14 = () => (
   <svg width={14} height={14} viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -38,7 +34,6 @@ export const IconCloseFill14 = () => (
   </svg>
 )
 
-/** ic_ds_close_outline_16 */
 export const IconCloseOutline16 = () => (
   <svg width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -52,7 +47,6 @@ export const IconCloseOutline16 = () => (
   </svg>
 )
 
-/** ic_ds_copy_outline_16 */
 export const IconCopyOutline16 = () => (
   <svg width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -62,7 +56,6 @@ export const IconCopyOutline16 = () => (
   </svg>
 )
 
-/** ic_ds_dark_outline_16 */
 export const IconDarkOutline16 = () => (
   <svg width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -72,7 +65,6 @@ export const IconDarkOutline16 = () => (
   </svg>
 )
 
-/** ic_ds_data_outline_16 */
 export const IconDataOutline16 = () => (
   <svg width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -90,7 +82,6 @@ export const IconDataOutline16 = () => (
   </svg>
 )
 
-/** ic_ds_download_outline_16 */
 export const IconDownloadOutline16 = () => (
   <svg width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -100,7 +91,6 @@ export const IconDownloadOutline16 = () => (
   </svg>
 )
 
-/** ic_ds_edit_outline_16 */
 export const IconEditOutline16 = () => (
   <svg width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -110,7 +100,6 @@ export const IconEditOutline16 = () => (
   </svg>
 )
 
-/** ic_ds_ellipsis_outline_16 */
 export const IconEllipsisOutline16 = () => (
   <svg width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -128,7 +117,6 @@ export const IconEllipsisOutline16 = () => (
   </svg>
 )
 
-/** ic_ds_followsystem_outline_16 */
 export const IconFollowsystemOutline16 = () => (
   <svg width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M12.4827 13.9839V15.2741H3.33758V13.9839H12.4827Z" fill="currentColor" />
@@ -139,7 +127,6 @@ export const IconFollowsystemOutline16 = () => (
   </svg>
 )
 
-/** ic_ds_light_outline_16 */
 export const IconLightOutline16 = () => (
   <svg width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -169,7 +156,6 @@ export const IconLightOutline16 = () => (
   </svg>
 )
 
-/** ic_ds_link_outline_14 */
 export const IconLinkOutline14 = () => (
   <svg width={14} height={14} viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -187,7 +173,6 @@ export const IconLinkOutline14 = () => (
   </svg>
 )
 
-/** ic_ds_menu_outline_20 */
 export const IconMenuOutline20 = () => (
   <svg width={20} height={20} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M17.2027 4.90034V6.43655H2.79724V4.90034H17.2027Z" fill="currentColor" />
@@ -195,7 +180,6 @@ export const IconMenuOutline20 = () => (
   </svg>
 )
 
-/** ic_ds_new_chat_outline_20 */
 export const IconNewChatOutline20 = () => (
   <svg width={20} height={20} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -205,7 +189,6 @@ export const IconNewChatOutline20 = () => (
   </svg>
 )
 
-/** ic_ds_panel_left_outline_16 */
 export const IconPanelLeftOutline16 = () => (
   <svg width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -217,7 +200,6 @@ export const IconPanelLeftOutline16 = () => (
   </svg>
 )
 
-/** ic_ds_paperclip_outline_16 */
 export const IconPaperclipOutline16 = () => (
   <svg width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -227,7 +209,6 @@ export const IconPaperclipOutline16 = () => (
   </svg>
 )
 
-/** ic_ds_refresh_outline_16 */
 export const IconRefreshOutline16 = () => (
   <svg width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -237,7 +218,6 @@ export const IconRefreshOutline16 = () => (
   </svg>
 )
 
-/** ic_ds_send_outline_16 */
 export const IconSendOutline16 = () => (
   <svg width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -247,11 +227,7 @@ export const IconSendOutline16 = () => (
   </svg>
 )
 
-/**
- * ic_ds_settings_outline_16
- * 不要加带固定 id 的 clipPath：页面上重复的 id 会让 url(#id) 指向第一个定义，
- * 那份定义所在的容器被隐藏时（如收起的移动端抽屉），其余同款图标会整个不显示
- */
+/** 设置图标直接绘制路径，各实例在侧边栏和弹窗中独立显示。 */
 export const IconSettingsOutline16 = () => (
   <svg width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -265,7 +241,6 @@ export const IconSettingsOutline16 = () => (
   </svg>
 )
 
-/** ic_ds_stop_fill_16 */
 export const IconStopFill16 = () => (
   <svg width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -275,7 +250,6 @@ export const IconStopFill16 = () => (
   </svg>
 )
 
-/** ic_ds_think_outline_14 */
 export const IconThinkOutline14 = () => (
   <svg width={14} height={14} viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -291,7 +265,6 @@ export const IconThinkOutline14 = () => (
   </svg>
 )
 
-/** ic_ds_think_outline_16 */
 export const IconThinkOutline16 = () => (
   <svg width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -307,7 +280,6 @@ export const IconThinkOutline16 = () => (
   </svg>
 )
 
-/** ic_ds_trash_outline_16 */
 export const IconTrashOutline16 = () => (
   <svg width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -317,7 +289,6 @@ export const IconTrashOutline16 = () => (
   </svg>
 )
 
-/** ic_ds_warning_outline_16 */
 export const IconWarningOutline16 = () => (
   <svg width={14} height={14} viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g clipPath="url(#clip0_44547_450044)">
@@ -336,7 +307,6 @@ export const IconWarningOutline16 = () => (
   </svg>
 )
 
-/** ic_ds_browse_outline_16 */
 export const IconBrowseOutline16 = () => (
   <svg width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M11.2426 4.80473V6.10551H4.75819V4.80473H11.2426Z" fill="currentColor" />
@@ -348,7 +318,6 @@ export const IconBrowseOutline16 = () => (
   </svg>
 )
 
-/** ic_ds_browse_warning_outline_16 */
 export const IconBrowseWarningOutline16 = () => (
   <svg width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -376,7 +345,6 @@ export const IconBrowseWarningOutline16 = () => (
   </svg>
 )
 
-/** ic_ds_checked_outline_14 */
 export const IconCheckedOutline14 = () => (
   <svg width={14} height={14} viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -386,7 +354,6 @@ export const IconCheckedOutline14 = () => (
   </svg>
 )
 
-/** ic_ds_globe_language_outline_14 */
 export const IconGlobeLanguageOutline14 = () => (
   <svg width={14} height={14} viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -398,7 +365,6 @@ export const IconGlobeLanguageOutline14 = () => (
   </svg>
 )
 
-/** ic_ds_link_outline_16 */
 export const IconLinkOutline16 = () => (
   <svg width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -416,7 +382,6 @@ export const IconLinkOutline16 = () => (
   </svg>
 )
 
-/** ic_ds_right_up_outline_14 */
 export const IconRightUpOutline14 = () => (
   <svg width={8} height={14} viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -426,7 +391,6 @@ export const IconRightUpOutline14 = () => (
   </svg>
 )
 
-/** ic_ds_search_outline_16 */
 export const IconSearchOutline16 = () => (
   <svg width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -440,7 +404,6 @@ export const IconSearchOutline16 = () => (
   </svg>
 )
 
-/** ic_ds_search_warning_outline_16 */
 export const IconSearchWarningOutline16 = () => (
   <svg width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -512,7 +475,6 @@ export const IconMicFill16 = () => (
   </svg>
 )
 
-/** ic_ds_play_media_outline_16 */
 export const IconPlayMediaOutline16 = () => (
   <svg width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -530,7 +492,6 @@ export const IconPlayMediaOutline16 = () => (
   </svg>
 )
 
-/** ic_ds_photo_error_fill_20 */
 export const IconPhotoErrorFill20 = () => (
   <svg width={20} height={20} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path

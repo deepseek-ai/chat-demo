@@ -1,6 +1,6 @@
 import type { Message, Session } from './types.js'
 
-/** 将旧版线性历史转换成单分支，保留消息 ID、内容及时间。 */
+/** 将线性消息列表规范化为单分支，保留消息 ID、内容及时间。 */
 export const normalizeSession = (session: Session): Session =>
   session.rootMessageId !== undefined
     ? session
@@ -14,7 +14,7 @@ export const normalizeSession = (session: Session): Session =>
         })),
       }
 
-/** 展示和请求共用同一条路径，不把其他版本混入上下文。 */
+/** 展示内容与请求上下文共用当前选中的分支路径。 */
 export const getVisibleMessages = (session: Session): Message[] => {
   if (session.rootMessageId === undefined) {
     return session.messages

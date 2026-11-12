@@ -10,8 +10,8 @@ import { UserMessage } from './UserMessage.js'
 import type { Message } from '../../services/chat/types.js'
 
 /**
- * 补传附件失败（可重试）时，失败的可能属于历史消息里的附件，不一定挂在最后一条提问下，
- * 所以整个会话共用一个重试入口：点击后按该回答重新补传并请求。
+ * 会话共用可重试的附件上传失败入口，覆盖当前提问与历史消息中的附件。
+ * 点击后按失败的回答重新补传附件并请求。
  */
 const getUploadRetryId = (messages: Message[], streaming: boolean) => {
   const last = messages.at(-1)
@@ -99,7 +99,7 @@ export const MessageList = ({
     [session.id, streaming]
   )
 
-  // 跨移动端断点时更换滚动层，但保留输入框及当前阅读位置。
+  // 跨移动端断点时切换滚动层，并保持输入框及当前阅读位置。
   useLayoutEffect(() => {
     const el = scrollRef.current
     if (!el) {
@@ -112,7 +112,7 @@ export const MessageList = ({
     }
     const onScroll = () => {
       const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < STICKY_THRESHOLD
-      // 布局或内容变高时，之前排队的 scroll 事件不代表用户离开了底部。
+      // 仅在用户向上滚动时停止跟随底部，布局或内容增高时保持跟随状态。
       if (nearBottom) {
         stickyRef.current = true
       } else if (el.scrollTop < scrollTopRef.current) {
