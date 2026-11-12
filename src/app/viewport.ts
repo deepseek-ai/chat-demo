@@ -20,10 +20,20 @@ export const useMobileViewport = (enabled: boolean) => {
       return
     }
     const viewport = window.visualViewport
+    const inputSelector = 'textarea, input:not([type="file"])'
     let animationFrame = 0
+    const reset = () => {
+      frame.style.removeProperty('--app-viewport-height')
+      frame.style.removeProperty('--app-viewport-top')
+    }
     const update = () => {
       // 双指缩放由浏览器处理，保持当前布局尺寸。
       if (viewport && viewport.scale !== 1) {
+        return
+      }
+      // 失焦后直接恢复 CSS 的全高布局，不等 Safari 收键盘后的 resize。
+      if (!document.activeElement?.matches(inputSelector)) {
+        reset()
         return
       }
       frame.style.setProperty(
@@ -32,24 +42,36 @@ export const useMobileViewport = (enabled: boolean) => {
       )
       frame.style.setProperty('--app-viewport-top', `${viewport?.offsetTop ?? 0}px`)
     }
+    const scheduleFrame = () => {
+      cancelAnimationFrame(animationFrame)
+      animationFrame = requestAnimationFrame(update)
+    }
     const schedule = () => {
       // 先同步跟上键盘动画，下一帧再校准 Safari 延迟更新的视口读数。
       update()
-      cancelAnimationFrame(animationFrame)
-      animationFrame = requestAnimationFrame(update)
+      scheduleFrame()
+    }
+    const onFocusIn = () => {
+      if (document.activeElement?.matches(inputSelector)) {
+        schedule()
+      }
     }
 
     update()
     viewport?.addEventListener('resize', schedule)
     viewport?.addEventListener('scroll', schedule)
     window.addEventListener('resize', schedule)
+    document.addEventListener('focusin', onFocusIn)
+    // 等点击和焦点切换完成，避免按钮移动、或切换输入框时短暂恢复全高。
+    document.addEventListener('focusout', scheduleFrame)
     return () => {
       cancelAnimationFrame(animationFrame)
       viewport?.removeEventListener('resize', schedule)
       viewport?.removeEventListener('scroll', schedule)
       window.removeEventListener('resize', schedule)
-      frame.style.removeProperty('--app-viewport-height')
-      frame.style.removeProperty('--app-viewport-top')
+      document.removeEventListener('focusin', onFocusIn)
+      document.removeEventListener('focusout', scheduleFrame)
+      reset()
     }
   }, [enabled])
 
