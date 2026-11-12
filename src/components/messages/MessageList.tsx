@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
+import { useIsMobile } from '../../app/viewport.js'
 import { getMessageVersions, getVisibleMessages } from '../../services/chat/branches.js'
 import { selectMessageVersion } from '../../services/chat/store.js'
 import type { Session } from '../../services/chat/types.js'
@@ -36,9 +37,11 @@ export const MessageList = ({
   streaming: boolean
   footer: React.ReactNode
 }) => {
+  const isMobile = useIsMobile()
   const scrollRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const stickyRef = useRef(true)
+  const scrollTopRef = useRef(0)
   const restoreScrollRef = useRef<{ messageId: string; top: number } | null>(null)
   const messages = getVisibleMessages(session)
   const lastMessageId = messages.at(-1)?.id
@@ -49,16 +52,18 @@ export const MessageList = ({
     }
   }, [])
 
-  // 结束时出现的操作栏、提示及异步内容也会改变高度，继续遵循当前跟随状态。
+  // 内容、键盘和输入框高度变化时，继续遵循当前跟随状态。
   useLayoutEffect(() => {
     const content = contentRef.current
-    if (!content) {
+    const scroll = scrollRef.current
+    if (!content || !scroll) {
       return
     }
     const observer = new ResizeObserver(scrollToBottom)
     observer.observe(content)
+    observer.observe(scroll)
     return () => observer.disconnect()
-  }, [scrollToBottom])
+  }, [isMobile, scrollToBottom])
 
   // 切换版本后将选择器留在原位置，避免回答长短变化导致操作区跳出视口。
   useLayoutEffect(() => {
@@ -93,50 +98,59 @@ export const MessageList = ({
     [session.id, streaming]
   )
 
-  useEffect(() => {
+  // 跨移动端断点时更换滚动层，但保留输入框及当前阅读位置。
+  useLayoutEffect(() => {
     const el = scrollRef.current
     if (!el) {
       return
     }
+    if (stickyRef.current) {
+      scrollToBottom()
+    } else {
+      el.scrollTop = scrollTopRef.current
+    }
     const onScroll = () => {
+      scrollTopRef.current = el.scrollTop
       stickyRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < STICKY_THRESHOLD
     }
     el.addEventListener('scroll', onScroll, { passive: true })
     return () => el.removeEventListener('scroll', onScroll)
-  }, [])
+  }, [isMobile, scrollToBottom])
 
   const lastIndex = messages.length - 1
   const uploadRetryId = getUploadRetryId(messages, streaming)
   return (
     <ScrollToBottomContext.Provider value={scrollToBottom}>
-      <div ref={scrollRef} className={styles.scroll}>
-        <div ref={contentRef} className={styles.column}>
-          {messages.map((message, index) =>
-            message.role === 'user' ? (
-              <UserMessage
-                key={message.id}
-                sessionId={session.id}
-                message={message}
-                retryUploadId={uploadRetryId}
-                isFirst={index === 0}
-                isLast={index === lastIndex || index === lastIndex - 1}
-                busy={streaming}
-                versions={getMessageVersions(session, message.id)}
-                onSelectVersion={selectVersion}
-              />
-            ) : (
-              <AssistantMessage
-                key={message.id}
-                sessionId={session.id}
-                message={message}
-                isLast={index === lastIndex}
-                streaming={streaming && index === lastIndex}
-                busy={streaming}
-                versions={getMessageVersions(session, message.id)}
-                onSelectVersion={selectVersion}
-              />
-            )
-          )}
+      <div ref={isMobile ? undefined : scrollRef} className={styles.container}>
+        <div ref={isMobile ? scrollRef : undefined} className={styles.scroll}>
+          <div ref={contentRef} className={styles.column}>
+            {messages.map((message, index) =>
+              message.role === 'user' ? (
+                <UserMessage
+                  key={message.id}
+                  sessionId={session.id}
+                  message={message}
+                  retryUploadId={uploadRetryId}
+                  isFirst={index === 0}
+                  isLast={index === lastIndex || index === lastIndex - 1}
+                  busy={streaming}
+                  versions={getMessageVersions(session, message.id)}
+                  onSelectVersion={selectVersion}
+                />
+              ) : (
+                <AssistantMessage
+                  key={message.id}
+                  sessionId={session.id}
+                  message={message}
+                  isLast={index === lastIndex}
+                  streaming={streaming && index === lastIndex}
+                  busy={streaming}
+                  versions={getMessageVersions(session, message.id)}
+                  onSelectVersion={selectVersion}
+                />
+              )
+            )}
+          </div>
         </div>
         {footer}
       </div>

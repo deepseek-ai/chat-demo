@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useSettings } from '../services/settings.js'
-import { useIsMobile } from './viewport.js'
+import { useIsMobile, useMobileViewport } from './viewport.js'
 import { reportStorageError } from '../services/chat/db.js'
 import { initChat, useChatStore } from '../services/chat/store.js'
 import { SearchPanel } from '../components/search/SearchPanel.js'
@@ -18,6 +18,7 @@ import styles from './App.module.css'
 
 export const App = () => {
   const isMobile = useIsMobile()
+  const frameRef = useMobileViewport(isMobile)
   const locale = useSettings((state) => state.locale)
   // 移动端侧边栏是抽屉，不受桌面端的收起状态影响
   const siderCollapsed = useSettings((state) => state.siderCollapsed) && !isMobile
@@ -49,7 +50,7 @@ export const App = () => {
 
   return (
     <>
-      <div className={styles.frame}>
+      <div ref={frameRef} className={styles.frame}>
         {isMobile ? <MobileSider /> : siderCollapsed ? null : <Sider />}
         <main className={styles.main}>
           {siderCollapsed ? <CollapsedSider /> : null}

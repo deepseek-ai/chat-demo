@@ -1,4 +1,4 @@
-.scroll {
+.container {
   flex: 1;
   min-height: 0;
   display: flex;
@@ -8,9 +8,24 @@
   scrollbar-color: var(--scroll-color) transparent;
 }
 
+.scroll {
+  display: contents;
+}
+
 @media not all and (min-width: 768px) {
-  .scroll {
+  .container {
+    overflow: hidden;
     scrollbar-gutter: auto;
+  }
+
+  .scroll {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scrollbar-color: var(--scroll-color) transparent;
   }
 }
 
