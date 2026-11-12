@@ -18,15 +18,17 @@
     color: var(--dsw-alias-brand-primary-invert);
   }
 
-  &:not(.active):hover {
-    background-color: var(--dsw-specific-sidebar-nav-item-hover);
-  }
+  @media (hover: hover) {
+    &:not(.active):hover {
+      background-color: var(--dsw-specific-sidebar-nav-item-hover);
+    }
 
-  &:hover,
-  &.active {
-    .mask,
-    .action {
-      display: flex;
+    &:hover,
+    &.active {
+      .mask,
+      .action {
+        display: flex;
+      }
     }
   }
 
@@ -83,6 +85,13 @@
   font: inherit;
   font-size: 14px;
   outline: none;
+}
+
+@media (hover: none) {
+  .mask,
+  .action {
+    display: flex;
+  }
 }
 
 @media not all and (min-width: 768px) {
