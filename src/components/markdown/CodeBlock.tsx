@@ -7,6 +7,8 @@ import {
   loadHighlight,
 } from '../../services/markdown/highlight.js'
 import { IconCheckOutline16, IconCopyOutline16 } from '../base/icons.js'
+import { showToast } from '../base/toastState.js'
+import { copyText } from '../../utils/clipboard.js'
 import { MermaidDiagram } from './MermaidDiagram.js'
 import styles from './CodeBlock.module.css'
 
@@ -52,7 +54,10 @@ const CodeInfoRow = ({
         type="button"
         className={styles.button}
         onClick={async () => {
-          await navigator.clipboard.writeText(code)
+          if (!(await copyText(code))) {
+            showToast({ key: 'copyFailed' })
+            return
+          }
           setCopied(true)
           setTimeout(() => setCopied(false), 1500)
         }}

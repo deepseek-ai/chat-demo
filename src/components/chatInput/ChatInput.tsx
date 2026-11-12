@@ -175,7 +175,11 @@ export const ChatInput = ({
     )
     setText('')
     attachments.clear()
-    textareaRef.current?.focus()
+    if (isMobile) {
+      textareaRef.current?.blur()
+    } else {
+      textareaRef.current?.focus()
+    }
   }
 
   return (

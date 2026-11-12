@@ -23,6 +23,7 @@ export const en = {
   sessionHistoryTimelineLabel30days: '30 Days',
   copy: 'Copy',
   copied: 'Copied',
+  copyFailed: 'Copy failed. Please long-press or select the text to copy.',
   send: 'Send',
   editMessage: 'Edit message',
   regenerate: 'Regenerate',

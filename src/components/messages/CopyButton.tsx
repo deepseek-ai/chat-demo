@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslate } from '../../i18n/index.js'
 import { IconCheckOutline16, IconCopyOutline16 } from '../base/icons.js'
 import { IconButton } from '../base/IconButton.js'
+import { showToast } from '../base/toastState.js'
+import { copyText } from '../../utils/clipboard.js'
 
 /** 复制成功后图标换成对勾 1 秒，期间再次点击不重复复制 */
 export const CopyButton = ({ text }: { text: string }) => {
@@ -15,14 +17,16 @@ export const CopyButton = ({ text }: { text: string }) => {
       icon={copied ? <IconCheckOutline16 /> : <IconCopyOutline16 />}
       tooltip={t('copy')}
       tooltipPlacement="bottom"
-      onClick={() => {
+      onClick={async () => {
         if (copied) {
           return
         }
-        void navigator.clipboard.writeText(text).then(() => {
-          setCopied(true)
-          timerRef.current = setTimeout(() => setCopied(false), 1000)
-        })
+        if (!(await copyText(text))) {
+          showToast({ key: 'copyFailed' })
+          return
+        }
+        setCopied(true)
+        timerRef.current = setTimeout(() => setCopied(false), 1000)
       }}
     />
   )

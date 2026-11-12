@@ -20,6 +20,7 @@ export const zh = {
   sessionHistoryTimelineLabel30days: '30 天内',
   copy: '复制',
   copied: '已复制',
+  copyFailed: '复制失败，请长按或选中文本后复制',
   send: '发送',
   editMessage: '编辑消息',
   regenerate: '重新生成',
