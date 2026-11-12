@@ -138,7 +138,7 @@ export const ChatInput = ({
     const end = textarea?.selectionEnd ?? text.length
     setText(text.slice(0, start) + transcript + text.slice(end))
     requestAnimationFrame(() => {
-      textarea?.focus()
+      textarea?.focus({ preventScroll: true })
       textarea?.setSelectionRange(start + transcript.length, start + transcript.length)
     })
   })
@@ -187,7 +187,7 @@ export const ChatInput = ({
       className={clsx(styles.wrapper, styles[variant])}
       onClick={(event) => {
         if (event.target === event.currentTarget) {
-          textareaRef.current?.focus()
+          textareaRef.current?.focus({ preventScroll: true })
         }
       }}
     >
@@ -213,6 +213,13 @@ export const ChatInput = ({
           autoFocus={!isMobile}
           value={text}
           onChange={(event) => setText(event.target.value)}
+          onMouseDown={(event) => {
+            // 首次点击时手动聚焦，避免 Safari 把整个页面滚到输入框位置。
+            if (isMobile && event.button === 0 && document.activeElement !== event.currentTarget) {
+              event.preventDefault()
+              event.currentTarget.focus({ preventScroll: true })
+            }
+          }}
           onKeyDown={(event) => {
             if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) {
               event.preventDefault()
