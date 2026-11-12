@@ -115,7 +115,7 @@
 
 .locationSelectors {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: flex-start;
   justify-content: flex-end;
   gap: 16px;
@@ -124,25 +124,18 @@
 }
 
 .locationSelectors > button {
-  min-height: 36px;
-  height: auto;
-  padding-block: 7px;
-  white-space: normal;
+  flex-shrink: 1;
+  min-width: 0;
   text-align: start;
-
-  > span:first-child {
-    overflow: visible;
-    overflow-wrap: anywhere;
-    text-overflow: clip;
-  }
 }
 
 .provinceSelect {
-  min-width: min(159px, 100%);
+  width: 159px;
 }
 
-.citySelect {
-  min-width: min(110px, 100%);
+.locationSelectors > .citySelect {
+  min-width: 120px;
+  width: 120px;
 }
 
 .countrySelect {
