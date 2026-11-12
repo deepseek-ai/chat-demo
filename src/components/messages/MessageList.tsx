@@ -49,6 +49,7 @@ export const MessageList = ({
     const el = scrollRef.current
     if (el && stickyRef.current) {
       el.scrollTop = el.scrollHeight
+      scrollTopRef.current = el.scrollTop
     }
   }, [])
 
@@ -110,8 +111,14 @@ export const MessageList = ({
       el.scrollTop = scrollTopRef.current
     }
     const onScroll = () => {
+      const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < STICKY_THRESHOLD
+      // 布局或内容变高时，之前排队的 scroll 事件不代表用户离开了底部。
+      if (nearBottom) {
+        stickyRef.current = true
+      } else if (el.scrollTop < scrollTopRef.current) {
+        stickyRef.current = false
+      }
       scrollTopRef.current = el.scrollTop
-      stickyRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < STICKY_THRESHOLD
     }
     el.addEventListener('scroll', onScroll, { passive: true })
     return () => el.removeEventListener('scroll', onScroll)

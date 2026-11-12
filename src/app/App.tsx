@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import { useEffect } from 'react'
 import { useSettings } from '../services/settings.js'
 import { useIsMobile, useMobileViewport } from './viewport.js'
@@ -18,7 +19,6 @@ import styles from './App.module.css'
 
 export const App = () => {
   const isMobile = useIsMobile()
-  const frameRef = useMobileViewport(isMobile)
   const locale = useSettings((state) => state.locale)
   // 移动端侧边栏是抽屉，不受桌面端的收起状态影响
   const siderCollapsed = useSettings((state) => state.siderCollapsed) && !isMobile
@@ -26,6 +26,8 @@ export const App = () => {
   const session = useChatStore((state) =>
     state.activeId === null ? null : state.sessions.find(({ id }) => id === state.activeId)
   )
+  const mobileSession = isMobile && Boolean(session)
+  const frameRef = useMobileViewport(mobileSession)
   const streaming = useChatStore((state) =>
     state.activeId === null ? false : state.activeId in state.streaming
   )
@@ -50,7 +52,7 @@ export const App = () => {
 
   return (
     <>
-      <div ref={frameRef} className={styles.frame}>
+      <div ref={frameRef} className={clsx(styles.frame, mobileSession && styles.mobileSession)}>
         {isMobile ? <MobileSider /> : siderCollapsed ? null : <Sider />}
         <main className={styles.main}>
           {siderCollapsed ? <CollapsedSider /> : null}

@@ -10,13 +10,13 @@ const subscribe = (onChange: () => void) => {
 
 export const useIsMobile = () => useSyncExternalStore(subscribe, () => query.matches)
 
-/** 键盘只缩小视觉视口时，让移动端聊天布局跟随可见区域，而非被页面整体推走。 */
-export const useMobileViewport = (isMobile: boolean) => {
+/** 仅会话页跟随视觉视口；首页交给浏览器布局，避免键盘滚动时反复补偿引起抖动。 */
+export const useMobileViewport = (enabled: boolean) => {
   const frameRef = useRef<HTMLDivElement>(null)
 
   useLayoutEffect(() => {
     const frame = frameRef.current
-    if (!isMobile || !frame) {
+    if (!enabled || !frame) {
       return
     }
     const viewport = window.visualViewport
@@ -49,7 +49,7 @@ export const useMobileViewport = (isMobile: boolean) => {
       frame.style.removeProperty('--app-viewport-height')
       frame.style.removeProperty('--app-viewport-top')
     }
-  }, [isMobile])
+  }, [enabled])
 
   return frameRef
 }

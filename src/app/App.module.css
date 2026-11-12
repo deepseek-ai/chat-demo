@@ -12,7 +12,7 @@
 }
 
 @media not all and (min-width: 768px) {
-  .frame {
+  .mobileSession {
     position: fixed;
     top: var(--app-viewport-top, 0px);
     bottom: auto;
