@@ -59,12 +59,17 @@ const userFragments = (message: UserMessage, exportImage: ExportImage): Fragment
 const toolFragment = (tool: ServerToolUseBlock, result: ReplyBlock | undefined): Fragment[] => {
   const { input } = tool
   if (input.action === 'search') {
-    // 格式没有搜索状态，失败与未完成都只能表示为没有结果。
     const items = result?.type === 'web_search_tool_result' ? result.content : []
     return [
       {
         type: 'TOOL_SEARCH',
         queries: input.queries,
+        status:
+          result?.type !== 'web_search_tool_result'
+            ? 'WIP'
+            : items.some((item) => item.type === 'web_search_tool_result_error')
+              ? 'FAILED'
+              : 'FINISHED',
         results: items.flatMap((item) =>
           item.type === 'web_search_result'
             ? [
@@ -82,20 +87,31 @@ const toolFragment = (tool: ServerToolUseBlock, result: ReplyBlock | undefined):
       },
     ]
   }
-  // 成功的阅读链接结果携带加密页面签名，原样保存在 READ_LINK。
+  // 成功结果的 URL / 标题用于展示，加密页面签名原样保存供后续请求恢复上下文。
   if (input.action === 'read_link') {
     return result?.type === 'web_fetch_tool_result' &&
       result.kind === 'read_link' &&
       result.content.type === 'web_fetch_result' &&
       result.signature
-      ? [{ type: 'READ_LINK', results: [{ signature: result.signature }] }]
+      ? [
+          {
+            type: 'READ_LINK',
+            results: [
+              {
+                url: result.content.url || input.url,
+                title: result.content.content.title,
+                signature: result.signature,
+              },
+            ],
+          },
+        ]
       : []
   }
   const content = result?.type === 'web_fetch_tool_result' ? result.content : undefined
   const page = content?.type === 'web_fetch_result' ? content : undefined
   const status = !content ? 'WIP' : page ? 'FINISHED' : 'FAILED'
   if (input.action === 'find_in_page') {
-    return [{ type: 'TOOL_FIND', status }]
+    return [{ type: 'TOOL_FIND', status, pattern: input.pattern }]
   }
   return [
     {
@@ -103,6 +119,8 @@ const toolFragment = (tool: ServerToolUseBlock, result: ReplyBlock | undefined):
       status,
       url: input.url || page?.url || null,
       title: page?.content.title ?? null,
+      snippet: page ? '' : null,
+      site_name: null,
       published_at: page ? isoOrNull(page.published_at) : null,
     },
   ]

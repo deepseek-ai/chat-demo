@@ -3,7 +3,7 @@ import { BackupError, fail } from './errors.js'
 import type { SessionIndexEntry } from './format.js'
 import { INDEX_PATH, MANIFEST_PATH, USER_PATH, parseSessionPath, sessionFilesDir } from './paths.js'
 import { checkManifest, readSessionFile, readSessionIndex } from './schema.js'
-import { toLocalSession, type LocalSession } from './toLocal.js'
+import { toLocalSession } from './toLocal.js'
 import {
   ArchiveError,
   isZipFile,
@@ -73,8 +73,9 @@ export const checkArchiveFormat = async (file: File): Promise<void> => {
 }
 
 /**
- * 按导出时的固定顺序流式导入：manifest → user（不导入）→ 每个会话 JSON 及其图片 → index。
- * 会话在读完它的图片后保存；同一时间只在内存中保留一个会话和一张图片。
+ * 流式导入：manifest → user（不导入）→ 全部会话 JSON → index → 全部图片。
+ * 同时兼容旧 v3 的会话与图片交错、index 位于末尾的顺序。
+ * 会话读完立即暂存，只保留图片路径映射；图片全部读完后逐会话回填附件类型。
  * 写入导入暂存存储；调用方负责先清空暂存，成功后替换正式数据，失败时清理暂存。
  */
 export const importArchive = async (file: File): Promise<void> => {
@@ -82,26 +83,12 @@ export const importArchive = async (file: File): Promise<void> => {
     fail('backupUnrecognized')
   }
   const imported = new Set<string>()
+  const images = new Map<string, string>()
   /** 已保存的原件：文件 ID → MIME。同一图片出现在多个会话目录时只保存一次。 */
   const stored = new Map<string, string>()
   let manifest = false
   let index: SessionIndexEntry[] | undefined
-  let current: LocalSession | undefined
-
-  const finishSession = async () => {
-    if (!current) {
-      return
-    }
-    for (const message of current.session.messages) {
-      if (message.role === 'user') {
-        for (const attachment of message.files) {
-          attachment.mimeType = stored.get(attachment.id) ?? ''
-        }
-      }
-    }
-    await db.addStagingSession(current.session)
-    current = undefined
-  }
+  let currentSessionId: string | undefined
 
   const saveImage = async (entry: ArchiveEntry, id: string) => {
     if (stored.has(id)) {
@@ -124,27 +111,30 @@ export const importArchive = async (file: File): Promise<void> => {
         }
         checkManifest(await readJson(entry))
         manifest = true
-      } else if (index) {
-        // index 必须是最后一个条目。
-        fail('backupIncomplete')
-      } else if (path === USER_PATH && imported.size === 0) {
+      } else if (path === USER_PATH && !index && imported.size === 0) {
         // 账号信息（已脱敏）不导入；文件可能缺失。
         await skipEntry(entry)
-      } else if (sessionId !== null) {
-        await finishSession()
+      } else if (sessionId !== null && !index) {
         const local = toLocalSession(readSessionFile(await readJson(entry)))
         if (local.session.id !== sessionId || imported.has(sessionId)) {
           fail('backupIncomplete')
         }
         imported.add(sessionId)
-        current = local
-      } else if (current && path.startsWith(sessionFilesDir(current.session.id))) {
-        // 没有被引用的条目不保存，引用了但缺失的图片只展示文件名。
-        const id = current.images.get(path)
-        await (id === undefined ? skipEntry(entry) : saveImage(entry, id))
-      } else if (path === INDEX_PATH) {
-        await finishSession()
+        currentSessionId = sessionId
+        for (const [imagePath, id] of local.images) {
+          images.set(imagePath, id)
+        }
+        await db.addStagingSession(local.session)
+      } else if (path === INDEX_PATH && !index) {
         index = readSessionIndex(await readJson(entry))
+      } else if (
+        index
+          ? imported.has(/^chat_sessions\/([^/]+)_files\//.exec(path)?.[1] ?? '')
+          : currentSessionId && path.startsWith(sessionFilesDir(currentSessionId))
+      ) {
+        // 没有被引用的条目不保存，引用了但缺失的图片只展示文件名。
+        const id = images.get(path)
+        await (id === undefined ? skipEntry(entry) : saveImage(entry, id))
       } else {
         fail('backupIncomplete')
       }
@@ -165,4 +155,5 @@ export const importArchive = async (file: File): Promise<void> => {
   ) {
     fail('backupIncomplete')
   }
+  await db.updateStagingFileTypes(stored)
 }

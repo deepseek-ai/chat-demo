@@ -225,7 +225,7 @@ const toAssistantParam = (
       if (fragment.type !== 'READ_LINK') {
         continue
       }
-      for (const [resultIndex, { signature }] of fragment.results.entries()) {
+      for (const [resultIndex, { signature, url, title }] of fragment.results.entries()) {
         if (!signature.trim()) {
           continue
         }
@@ -236,7 +236,7 @@ const toAssistantParam = (
             type: 'server_tool_use',
             id: toolId,
             name: 'deepseek_read_url',
-            input: { action: 'read_link', url: '' },
+            input: { action: 'read_link', url: url ?? '' },
             kind: 'read_link',
           },
           {
@@ -246,12 +246,12 @@ const toAssistantParam = (
             signature,
             content: {
               type: 'web_fetch_result',
-              // 展示字段不进入上下文；真实网址、标题与正文由服务端从签名解密恢复。
-              url: '',
+              // 明文元数据随结果回传；网页正文仍由服务端从签名解密恢复。
+              url: url ?? '',
               content: {
                 type: 'document',
                 source: { type: 'text', media_type: 'text/plain', data: '' },
-                title: '',
+                title: title ?? null,
               },
               published_at: null,
             },

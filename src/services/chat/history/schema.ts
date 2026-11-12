@@ -11,7 +11,7 @@ import {
 
 /**
  * 按格式定义严格校验，返回只含已定义字段的新对象：缺字段、类型或枚举不符都视为文件不完整。
- * 可空字段必须显式为 null，不接受缺省；site_icon 是可选扩展，允许缺省。
+ * 可空字段必须显式为 null；v3 内新增字段与 site_icon 扩展允许缺省，存在时仍严格校验。
  */
 
 type Read<T> = (value: unknown) => T
@@ -34,12 +34,21 @@ const number: Read<number> = (value) =>
 const count: Read<number> = (value) =>
   Number.isSafeInteger(value) && (value as number) >= 0 ? (value as number) : invalid()
 
-const time: Read<string> = (value) =>
-  typeof value === 'string' &&
-  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value) &&
-  new Date(value).toISOString() === value
+const time: Read<string> = (value) => {
+  if (typeof value !== 'string') {
+    return invalid()
+  }
+  const match = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d+))?Z$/.exec(value)
+  if (!match) {
+    return invalid()
+  }
+  // Date 只保留毫秒；校验时补齐/截断精度，返回时保留原文，避免丢失微秒或纳秒。
+  const milliseconds = `${match[1]}.${(match[2] ?? '').padEnd(3, '0').slice(0, 3)}Z`
+  const parsed = new Date(milliseconds)
+  return Number.isFinite(parsed.getTime()) && parsed.toISOString() === milliseconds
     ? value
     : invalid()
+}
 
 const nullable =
   <T>(read: Read<T>): Read<T | null> =>
@@ -57,6 +66,11 @@ const oneOf =
     values.includes(value as T) ? (value as T) : invalid()
 
 const tipStyle = oneOf('INFO', 'WARNING', 'CAUTION')
+const searchStatus = oneOf('WIP', 'FINISHED', 'FAILED')
+const toolMetadata = (item: Record<string, unknown>) => ({
+  ...('stage_id' in item ? { stage_id: count(item.stage_id) } : {}),
+  ...('group_id' in item ? { group_id: count(item.group_id) } : {}),
+})
 
 const searchResult: Read<SearchResult> = (value) => {
   const item = record(value)
@@ -114,29 +128,47 @@ const fragment: Read<Fragment> = (value) => {
         type,
         queries: list(string)(item.queries),
         results: list(searchResult)(item.results),
+        ...('status' in item ? { status: searchStatus(item.status) } : {}),
+        ...toolMetadata(item),
       }
     case 'TOOL_OPEN':
       return {
         type,
-        status: oneOf('WIP', 'FINISHED', 'FAILED')(item.status),
+        status: searchStatus(item.status),
         url: nullable(string)(item.url),
         title: nullable(string)(item.title),
+        ...('snippet' in item ? { snippet: nullable(string)(item.snippet) } : {}),
+        ...('site_name' in item ? { site_name: nullable(string)(item.site_name) } : {}),
         published_at: nullable(time)(item.published_at),
+        ...toolMetadata(item),
       }
     case 'TOOL_FIND':
-      return { type, status: oneOf('WIP', 'FINISHED', 'NO_RESULT', 'FAILED')(item.status) }
+      return {
+        type,
+        status: oneOf('WIP', 'FINISHED', 'NO_RESULT', 'FAILED')(item.status),
+        ...('pattern' in item ? { pattern: string(item.pattern) } : {}),
+        ...toolMetadata(item),
+      }
     case 'READ_LINK':
       return {
         type,
-        results: list((result) => ({ signature: string(record(result).signature) }))(item.results),
+        results: list((result) => {
+          const entry = record(result)
+          return {
+            signature: string(entry.signature),
+            ...('url' in entry ? { url: string(entry.url) } : {}),
+            ...('title' in entry ? { title: nullable(string)(entry.title) } : {}),
+          }
+        })(item.results),
       }
     case 'FILE':
       return { type, files: list(fileEntry)(item.files) }
     case 'TOOL_IMAGE_SEARCH':
       return {
         type,
-        status: oneOf('WIP', 'FINISHED', 'FAILED')(item.status),
-        image_indexes: list(count)(item.image_indexes),
+        status: searchStatus(item.status),
+        ...('image_indexes' in item ? { image_indexes: list(count)(item.image_indexes) } : {}),
+        ...toolMetadata(item),
         results: list((result) => {
           const entry = record(result)
           return {

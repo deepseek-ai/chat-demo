@@ -1,7 +1,7 @@
 {
-  "name": "deepseek-chat-standalone",
+  "name": "deepseek-chat-demo",
   "version": "0.1.0",
-  "description": "DeepSeek Chat 独立版：基于公开 API 的静态网页，file:// 直接打开即可使用",
+  "description": "基于 DeepSeek API 的静态聊天示例，使用 React、TypeScript 和 Rspack。",
   "license": "MIT",
   "private": true,
   "type": "module",

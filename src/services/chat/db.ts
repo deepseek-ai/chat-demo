@@ -99,6 +99,35 @@ export const addStagingSession = async (session: Session): Promise<void> => {
 export const saveStagingFiles = (files: StoredFile[]): Promise<void> =>
   putFiles('filesStaging', files)
 
+/** 图片位于会话 JSON 之后；全部读完后逐条回填附件类型，缺失原件仍只展示文件名。 */
+export const updateStagingFileTypes = async (types: ReadonlyMap<string, string>): Promise<void> => {
+  const tx = (await getDB()).transaction('sessionsStaging', 'readwrite')
+  await Promise.all([
+    (async () => {
+      for (let cursor = await tx.store.openCursor(); cursor; cursor = await cursor.continue()) {
+        const session = cursor.value
+        let changed = false
+        for (const message of session.messages) {
+          if (message.role !== 'user') {
+            continue
+          }
+          for (const file of message.files) {
+            const type = types.get(file.id) ?? ''
+            if (file.mimeType !== type) {
+              file.mimeType = type
+              changed = true
+            }
+          }
+        }
+        if (changed) {
+          await cursor.update(session)
+        }
+      }
+    })(),
+    tx.done,
+  ])
+}
+
 /**
  * 导入完成后用暂存替换正式数据：在同一事务中清空 `sessions` / `files`、逐条移入暂存内容并清空暂存。
  * 逐条游标复制，同一时间只读取一条记录；事务失败时整体回滚，正式数据不变。

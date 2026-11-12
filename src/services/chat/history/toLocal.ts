@@ -102,7 +102,8 @@ const unavailable: WebFetchToolResultBlock['content'] = {
 /**
  * 片段转换为本地展示块：
  * - 普通搜索与边想边搜共用 TOOL_SEARCH，以同一回复是否有打开 / 查找网页来区分；
- * - READ_LINK 只有密文，不生成展示块，请求时从原文签名恢复上下文；没有链接的 TOOL_OPEN 不展示；
+ * - READ_LINK 用明文 URL / 标题展示，旧版只有签名的结果不展示；请求时从原文恢复签名；
+ * - 没有链接的 TOOL_OPEN 不展示；
  * - 没有对应展示的片段记为不支持，回复下方提示部分内容无法展示。
  */
 const toBlocks = (fragments: Fragment[]): ReplyBlock[] => {
@@ -124,23 +125,31 @@ const toBlocks = (fragments: Fragment[]): ReplyBlock[] => {
           id,
           { action: 'search', query: item.queries[0] ?? '', queries: item.queries },
           searchKind,
-          {
-            type: 'web_search_tool_result',
-            tool_use_id: id,
-            kind: searchKind,
-            content: item.results
-              .filter((result) => isWebUrl(result.url))
-              .map((result) => ({
-                type: 'web_search_result',
-                url: result.url,
-                title: result.title,
-                snippet: result.snippet,
-                site_icon: result.site_icon && isWebUrl(result.site_icon) ? result.site_icon : null,
-                site_name: result.site_name,
-                page_age: result.published_at,
-                encrypted_content: '',
-              })),
-          }
+          item.status === 'WIP'
+            ? undefined
+            : {
+                type: 'web_search_tool_result',
+                tool_use_id: id,
+                kind: searchKind,
+                content:
+                  item.status === 'FAILED'
+                    ? [{ type: 'web_search_tool_result_error', error_code: 'unavailable' }]
+                    : item.results
+                        .filter((result) => isWebUrl(result.url))
+                        .map((result) => ({
+                          type: 'web_search_result',
+                          url: result.url,
+                          title: result.title,
+                          snippet: result.snippet,
+                          site_icon:
+                            result.site_icon && isWebUrl(result.site_icon)
+                              ? result.site_icon
+                              : null,
+                          site_name: result.site_name,
+                          page_age: result.published_at,
+                          encrypted_content: '',
+                        })),
+              }
         )
       case 'TOOL_OPEN':
         if (!item.url || !isWebUrl(item.url)) {
@@ -162,14 +171,26 @@ const toBlocks = (fragments: Fragment[]): ReplyBlock[] => {
       case 'TOOL_FIND':
         return toolBlocks(
           id,
-          { action: 'find_in_page', url: '', pattern: '' },
+          { action: 'find_in_page', url: '', pattern: item.pattern ?? '' },
           'deep_search',
           item.status === 'WIP'
             ? undefined
             : fetchResult(id, item.status === 'FINISHED' ? fetched('', null, null) : unavailable)
         )
       case 'READ_LINK':
-        return []
+        return item.results.flatMap((result, resultIndex) => {
+          if (!result.url || !isWebUrl(result.url)) {
+            return []
+          }
+          const toolId = `${id}-${resultIndex}`
+          return toolBlocks(toolId, { action: 'read_link', url: result.url }, 'read_link', {
+            type: 'web_fetch_tool_result',
+            tool_use_id: toolId,
+            kind: 'read_link',
+            content: fetched(result.url, result.title ?? null, null),
+            signature: result.signature,
+          })
+        })
       default:
         return [{ type: 'unsupported', blockType: item.type }]
     }

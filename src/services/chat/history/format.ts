@@ -1,9 +1,9 @@
 /**
  * 历史会话导出产物（deepseek_data-*.zip）的类型定义。
  *
- * - 时间均为 UTC ISO-8601、Z 结尾、固定 3 位毫秒；
+ * - 时间均为 UTC RFC 3339、Z 结尾，小数秒精度不固定；
  * - 消息树的排序与引用只用 id，不用 inserted_at；
- * - 可空字段用 null 表示；可选扩展另行标注。
+ * - 可空字段用 null 表示；v3 内新增字段允许缺省，以兼容旧产物。
  */
 
 /** 2026-11-11T02:33:23.270Z */
@@ -14,7 +14,7 @@ export const EXPORT_FORMAT_VERSION = 3
 /** manifest.json，ZIP 的第一个条目 */
 export type Manifest = { export_format_version: typeof EXPORT_FORMAT_VERSION }
 
-/** chat_session_index.json 的一项，只列出成功写出的会话；整个文件是 ZIP 的最后一个条目 */
+/** chat_session_index.json 的一项，只列出成功写出的会话；位于全部会话 JSON 之后、图片之前 */
 export type SessionIndexEntry = {
   id: string
   title: string | null
@@ -109,26 +109,50 @@ export type ToolSearchFragment = {
   type: 'TOOL_SEARCH'
   queries: string[]
   results: SearchResult[]
+  /** 旧版 v3 没有状态；FINISHED + 空结果不等于失败 */
+  status?: SearchStatus
+  /** 第几轮模型推理；早期会话或不分轮次的工具可能缺省 */
+  stage_id?: number
+  /** 部分产物携带的分组标识，原样保留 */
+  group_id?: number
 }
+
+export type SearchStatus = 'WIP' | 'FINISHED' | 'FAILED'
 
 export type ToolOpenStatus = 'WIP' | 'FINISHED' | 'FAILED'
 
-/** 边想边搜里打开的页面；三个可选字段同时为 null 时只有动作、没有内容 */
+/** 边想边搜里打开的页面；页面信息同时为 null 时只有动作、没有内容 */
 export type ToolOpenFragment = {
   type: 'TOOL_OPEN'
   status: ToolOpenStatus
   url: string | null
   title: string | null
+  snippet?: string | null
+  site_name?: string | null
   published_at: Iso8601Utc | null
+  stage_id?: number
+  group_id?: number
 }
 
 export type ToolFindStatus = 'WIP' | 'FINISHED' | 'NO_RESULT' | 'FAILED'
 
-/** 页面内查找，不导出查找词 */
-export type ToolFindFragment = { type: 'TOOL_FIND'; status: ToolFindStatus }
+/** 页面内查找；旧版 v3 没有查找词 */
+export type ToolFindFragment = {
+  type: 'TOOL_FIND'
+  status: ToolFindStatus
+  pattern?: string
+  stage_id?: number
+  group_id?: number
+}
 
-/** 阅读链接结果：正文只有 deepseek-api 的密钥才能解密 */
-export type ReadLinkFragment = { type: 'READ_LINK'; results: { signature: string }[] }
+/** 阅读链接结果：url/title 用于展示；旧版只有签名，正文仍需服务端解密 */
+export type ReadLinkResult = {
+  url?: string
+  title?: string | null
+  signature: string
+}
+
+export type ReadLinkFragment = { type: 'READ_LINK'; results: ReadLinkResult[] }
 
 export type FileEntry = {
   /** 不带 file- 前缀的 UUID */
@@ -148,7 +172,7 @@ export type FileEntry = {
 /** 非图片文件只有元数据，本体不在产物里 */
 export type FileFragment = { type: 'FILE'; files: FileEntry[] }
 
-export type ImageSearchStatus = 'WIP' | 'FINISHED' | 'FAILED'
+export type ImageSearchStatus = SearchStatus
 
 export type ImageSearchResult = {
   title: string
@@ -158,12 +182,14 @@ export type ImageSearchResult = {
   published_at: Iso8601Utc | null
 }
 
-/** 图搜：image_indexes 指向本次提问里用户上传的第几张图，结果不含图片本身 */
+/** 图搜：结果不含图片本身；image_indexes 只在旧版 v3 中出现 */
 export type ToolImageSearchFragment = {
   type: 'TOOL_IMAGE_SEARCH'
   status: ImageSearchStatus
-  image_indexes: number[]
+  image_indexes?: number[]
   results: ImageSearchResult[]
+  stage_id?: number
+  group_id?: number
 }
 
 export type Fragment =
