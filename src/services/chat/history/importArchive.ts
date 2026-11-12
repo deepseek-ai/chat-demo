@@ -13,7 +13,7 @@ import {
   type ArchiveEntry,
 } from './zipReader.js'
 
-/** 从原件字节识别图片类型，不相信扩展名；无法识别时为空字符串，按普通文件展示。 */
+/** 从原件字节识别图片类型；无法识别时为空字符串，按普通文件展示。 */
 const imageType = (bytes: Uint8Array): string => {
   const startsWith = (...prefix: number[]) => prefix.every((byte, index) => bytes[index] === byte)
   const header = new TextDecoder('ascii').decode(bytes.subarray(0, 12))
@@ -51,8 +51,8 @@ const readJson = async (entry: ArchiveEntry): Promise<unknown> => {
 }
 
 /**
- * 确认导入后、开始写入前只读取首个条目确认格式：不是 ZIP、首个条目不是 manifest，或版本不是当前格式时直接报错。
- * 不是当前导出格式的产物都在此拒绝，不停止生成，也不写入暂存。
+ * 检查 ZIP 格式、首个 manifest 条目及格式版本。
+ * 校验失败时保留正在生成的回答和现有暂存数据。
  */
 export const checkArchiveFormat = async (file: File): Promise<void> => {
   if (!(await isZipFile(file))) {
@@ -74,7 +74,7 @@ export const checkArchiveFormat = async (file: File): Promise<void> => {
 
 /**
  * 流式导入：manifest → user（不导入）→ 全部会话 JSON → index → 全部图片。
- * 同时兼容旧 v3 的会话与图片交错、index 位于末尾的顺序。
+ * 也支持会话与图片交错排列、index 位于末尾的条目顺序。
  * 会话读完立即暂存，只保留图片路径映射；图片全部读完后逐会话回填附件类型。
  * 写入导入暂存存储；调用方负责先清空暂存，成功后替换正式数据，失败时清理暂存。
  */

@@ -25,17 +25,17 @@ export const Link = memo(function Link({
   node: LinkNode
   children: ReactNode
 }) {
-  // 先不渲染 anchor link，等之后产品方案
+  // 页内锚点显示链接文字。
   if (node.url.startsWith('#')) {
     return children
   }
 
-  // 邮箱大概率是幻觉，直接不渲染了；不改 parse 是因为改不动，都封装在插件里
+  // 邮件地址显示链接文字。
   if (node.url.startsWith('mailto:')) {
     return children
   }
 
-  // todo: fix sanitize, new URL 无法正确初始化 `www.a.com？` 这个 url
+  // URL 解析失败时 href 为空，链接文字仍可显示。
   const href = sanitizeUrl(node.url)
 
   return (
@@ -45,7 +45,7 @@ export const Link = memo(function Link({
   )
 })
 
-/** 图片不直接展示，渲染为链接 */
+/** Markdown 图片显示为指向图片地址的链接 */
 export function ImageAsLink({ node }: { node: Image }) {
   const url = sanitizeUrl(node.url)
   return (

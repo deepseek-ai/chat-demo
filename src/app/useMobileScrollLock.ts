@@ -50,7 +50,7 @@ export const useMobileScrollLock = (enabled: boolean) => {
       }
       const target = event.target instanceof Element ? event.target : null
       const field = target?.closest('input, textarea')
-      // 保留输入框光标操作、现有选区拖动；不因页面其他位置的选区放开滚动。
+      // 仅放行输入框光标操作和触点所在选区的拖动。
       if (
         (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement) &&
         (horizontal ||

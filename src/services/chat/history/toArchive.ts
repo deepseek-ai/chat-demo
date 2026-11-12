@@ -11,7 +11,7 @@ import type {
   SessionIndexEntry,
 } from './format.js'
 
-/** 返回图片在 ZIP 里的条目名；没有原件或不是图片时返回 null，此时只导出元数据。 */
+/** 返回图片原件在 ZIP 里的条目名；无原件或非图片附件返回 null，仅导出元数据。 */
 export type ExportImage = (file: { id: string; name: string; isImage: boolean }) => string | null
 
 const iso = (ms: number) => new Date(ms).toISOString()

@@ -18,7 +18,7 @@ export const VoiceButton = ({
   onClick,
 }: {
   status: VoiceInputStatus
-  /** 当前页面无法录音（非安全上下文）时置灰，tooltip 改为提示需要 HTTPS */
+  /** 非安全上下文中按钮置灰，tooltip 提示录音需要 HTTPS */
   disabled?: boolean
   getLevel: () => number
   onClick: () => void
@@ -27,7 +27,7 @@ export const VoiceButton = ({
   const haloRef = useRef<HTMLSpanElement>(null)
   const recording = status === 'recording'
 
-  // 按帧读取音量写到 CSS 变量，不经过 React 渲染
+  // 按帧读取音量并直接写入 CSS 变量。
   useEffect(() => {
     if (!recording) {
       return

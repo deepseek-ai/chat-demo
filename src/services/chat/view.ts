@@ -20,7 +20,7 @@ export type Source = {
   siteName: string
   /** 搜索结果为 RFC 3339，阅读链接为爬虫提取的原始日期 */
   publishedAt: string | null
-  /** 明文摘要与站点图标；旧历史或无元数据的引用来源为 null */
+  /** 明文摘要与站点图标；缺少元数据时为 null */
   snippet: string | null
   siteIcon: string | null
   /** 引用角标与搜索结果列表上的编号，从 1 开始 */
@@ -56,7 +56,7 @@ export type ReadLinkStep = { type: 'read_link'; links: PageItem[] }
 
 export type ThinkingStep = { type: 'thinking'; key: string; blocks: ThinkingPart[] }
 
-/** 工具调用之前输出的过程性文字 */
+/** 工具调用前输出的说明文字 */
 export type PreambleStep = { type: 'text'; key: string; markdown: string }
 
 export type Step = SearchStep | OpenStep | FindStep | ReadLinkStep | ThinkingStep | PreambleStep
@@ -314,7 +314,7 @@ export const buildReplyView = (reply: AssistantMessage, streaming: boolean): Rep
   }
 }
 
-/** 思考总用时（秒）：各思考块用时之和，至少 1 秒；导入的原版回复没有总用时，返回 null。 */
+/** 思考总用时（秒）：各思考块用时之和，至少 1 秒；导入回复的总用时为 null。 */
 export const getTotalThinkingSeconds = (steps: Step[], now: number) => {
   let total = 0
   for (const step of steps) {

@@ -33,7 +33,7 @@ pnpm build
 
 ## 数据
 
-API Key 和设置保存在浏览器 localStorage，会话及附件原件保存在 IndexedDB。发送对话、上传附件和使用语音功能时，相应内容会提交给配置的 API 服务。没有账号登录或跨设备同步。
+API Key 和设置保存在浏览器 localStorage，会话及附件原件保存在 IndexedDB，本地数据按浏览器隔离。发送对话、上传附件和使用语音功能时，相应内容会提交给配置的 API 服务。
 
 设置中的历史导入导出使用 `export_format_version: 3` 的 ZIP。导入会在确认并校验成功后替换全部本地会话和附件；导出包含会话与本地可用的图片原件，不包含 API Key、设置或非图片附件原件。格式与保留范围见[历史导入导出](src/services/chat/history/README.md)。
 
@@ -47,7 +47,7 @@ API Key 和设置保存在浏览器 localStorage，会话及附件原件保存�
 | `pnpm lint`   | oxlint 检查         |
 | `pnpm format` | oxfmt 格式化        |
 
-[rspack.config.ts](rspack.config.ts) 默认连接 `https://api.deepseek.com`，导出 `createConfig({ apiOrigin, devServer })` 供本地代理配置复用。临时配置放在已忽略的 `tmp/` 下。
+[rspack.config.ts](rspack.config.ts) 默认连接 `https://api.deepseek.com`。`createConfig({ apiOrigin, devServer })` 支持自定义 API 地址和开发服务器代理。`tmp/` 用于存放本地配置，已加入 Git 忽略列表。
 
 聊天默认使用 `deepseek-flash`，通过 Anthropic 兼容的 Messages / Files API 通信；语音使用 ASR / TTS 接口。请求使用搜索、链接阅读、标题和 `latest_reminder` 等扩展，接入服务需支持相应能力。附件实际支持的格式以服务端校验为准。
 

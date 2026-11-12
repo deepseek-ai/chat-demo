@@ -24,7 +24,7 @@ export const exportHistory = (): Promise<{ name: string; blob: Blob }> =>
   })
 
 /**
- * 确认覆盖后调用：先检查格式，不是当前导出格式直接报错，不中止正在生成的回答；
+ * 确认覆盖后调用：先检查 ZIP 格式与版本，校验失败时保留正在生成的回答；
  * 通过后从 ZIP 流式写入暂存，成功才替换原有会话与图片原件。返回导入的会话数。
  */
 export const importHistory = (file: File): Promise<number> =>

@@ -286,7 +286,7 @@ const toAssistantParam = (
     }
     text = null
     if (prefix && thinking && block.type === 'thinking') {
-      // 续写仍属于本轮，保留思考；历史轮次仍按原规则省略。
+      // 续写保留本轮思考，历史轮次的思考省略。
       const { type, thinking, signature } = block
       content.push({ type, thinking, signature: signature ?? '' })
     } else if (block.type === 'server_tool_use' && block.kind === 'read_link') {
@@ -329,7 +329,7 @@ export const toRequestMessages = (
   const messages: MessageParam[] = []
   let previousReminder: string | undefined
   const appendReminder = (reminder: string | undefined) => {
-    // 只在当前分支首次出现或内容变化时插入；没有快照的旧历史不倒填。
+    // 仅在当前分支首次出现或内容变化时插入快照；缺少快照的消息保持原有内容。
     if (reminder && reminder !== previousReminder) {
       messages.push({ role: 'latest_reminder', content: reminder })
       previousReminder = reminder

@@ -235,7 +235,7 @@ export const MarkdownAstRenderer = memo(function MarkdownAstRenderer({
   return useMemo(
     () => (
       <div className={clsx('ds-markdown', className)}>
-        {/* 解析器只会在根节点下产出块级内容（未启用 frontmatter，不会出现 yaml） */}
+        {/* 解析器在根节点下产出块级内容。 */}
         <MarkdownBlockContentOrDefinitionContent
           nodes={ast.children as Array<BlockContent | DefinitionContent>}
           loading={loading}

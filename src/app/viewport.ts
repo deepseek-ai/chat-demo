@@ -22,7 +22,7 @@ export const useMobileViewport = (enabled: boolean) => {
     const viewport = window.visualViewport
     let animationFrame = 0
     const update = () => {
-      // 双指缩放继续交给浏览器，不按放大后的可视区域重新排版。
+      // 双指缩放由浏览器处理，保持当前布局尺寸。
       if (viewport && viewport.scale !== 1) {
         return
       }

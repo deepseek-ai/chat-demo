@@ -20,7 +20,7 @@ type ReadAloudState = {
 
 export const useReadAloud = create<ReadAloudState>(() => ({ messageId: null, status: 'idle' }))
 
-/** 固定使用默认音色，不提供音色选择 */
+/** 朗读使用默认音色 */
 const VOICE: TtsVoice = 'stella'
 
 /** 首帧前多缓冲一点，减少网络抖动造成的断续 */

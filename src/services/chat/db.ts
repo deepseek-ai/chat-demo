@@ -26,7 +26,7 @@ let dbPromise: Promise<IDBPDatabase<ChatDB>> | null = null
 const getDB = () =>
   (dbPromise ??= openDB<ChatDB>('deepseek-chat-standalone', 8, {
     upgrade(db) {
-      // 旧结构不做迁移，升级时直接清空重建；版本号需高于 v7。
+      // 数据库版本升级时清空并重建会话、附件及导入暂存存储。
       for (const name of Array.from(db.objectStoreNames)) {
         ;(db as unknown as IDBPDatabase).deleteObjectStore(name)
       }

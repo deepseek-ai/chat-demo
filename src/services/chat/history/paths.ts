@@ -9,11 +9,11 @@ export const sessionPath = (sessionId: string) => `chat_sessions/${sessionId}.js
 /** 会话自己的图片目录，带结尾斜杠 */
 export const sessionFilesDir = (sessionId: string) => `chat_sessions/${sessionId}_files/`
 
-/** 会话 JSON 条目对应的会话 ID；不是会话 JSON 时返回 null */
+/** 会话 JSON 条目对应的会话 ID；其他条目返回 null */
 export const parseSessionPath = (path: string): string | null =>
   /^chat_sessions\/([^/]+)\.json$/.exec(path)?.[1] ?? null
 
-/** 路径分隔符替换成 _，空值、. 与 .. 改为 unnamed */
+/** 安全路径片段：路径分隔符映射为 _，空值、. 与 .. 映射为 unnamed */
 const safeName = (name: string) => {
   const result = name.replace(/[/\\]/g, '_')
   return result === '' || result === '.' || result === '..' ? 'unnamed' : result

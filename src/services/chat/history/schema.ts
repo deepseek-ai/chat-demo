@@ -11,7 +11,7 @@ import {
 
 /**
  * 按格式定义严格校验，返回只含已定义字段的新对象：缺字段、类型或枚举不符都视为文件不完整。
- * 可空字段必须显式为 null；v3 内新增字段与 site_icon 扩展允许缺省，存在时仍严格校验。
+ * 可空字段必须显式为 null；可选字段允许缺省，存在时严格校验。
  */
 
 type Read<T> = (value: unknown) => T
@@ -214,7 +214,7 @@ const sessionId: Read<string> = (value) => {
   return id && !/[/\\]/.test(id) && id !== '.' && id !== '..' ? id : invalid()
 }
 
-/** 版本号不随字段级变化递增，只用来拒绝无法解析的产物；字段结构由下面的校验保证。 */
+/** 版本号用于校验归档格式兼容性；字段结构由各字段的校验函数保证。 */
 export const checkManifest = (value: unknown): void => {
   const version = record(value).export_format_version
   if (typeof version === 'number' && version > EXPORT_FORMAT_VERSION) {

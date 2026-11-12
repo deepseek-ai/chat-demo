@@ -22,7 +22,7 @@ export const App = () => {
   const isMobile = useIsMobile()
   useMobileScrollLock(isMobile)
   const locale = useSettings((state) => state.locale)
-  // 移动端侧边栏是抽屉，不受桌面端的收起状态影响
+  // 移动端侧边栏以独立抽屉管理开合状态
   const siderCollapsed = useSettings((state) => state.siderCollapsed) && !isMobile
   const ready = useChatStore((state) => state.ready)
   const session = useChatStore((state) =>

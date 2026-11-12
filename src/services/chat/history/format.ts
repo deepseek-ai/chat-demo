@@ -2,8 +2,8 @@
  * 历史会话导出产物（deepseek_data-*.zip）的类型定义。
  *
  * - 时间均为 UTC RFC 3339、Z 结尾，小数秒精度不固定；
- * - 消息树的排序与引用只用 id，不用 inserted_at；
- * - 可空字段用 null 表示；v3 内新增字段允许缺省，以兼容旧产物。
+ * - 消息树按 id 排序和引用；
+ * - 可空字段用 null 表示；可选字段允许缺省。
  */
 
 /** 2026-11-11T02:33:23.270Z */
@@ -57,7 +57,7 @@ export type ChatMessage = {
   status: ChatMessageStatus
   thinking_enabled: boolean
   search_enabled: boolean
-  /** 沿分支累计的上下文 token，不是本条用量 */
+  /** 沿分支累计的上下文 token */
   accumulated_token_usage: number
   inserted_at: Iso8601Utc
   /** 按发生顺序排列 */
@@ -82,10 +82,10 @@ export type TemplateResponseFragment = { type: 'TEMPLATE_RESPONSE'; content: str
 
 export type TipStyle = 'INFO' | 'WARNING' | 'CAUTION'
 
-/** 文案是导出时的兜底 locale（en），未必是用户当时的界面语言 */
+/** 文案使用导出时的兜底语言（en） */
 export type TipFragment = { type: 'TIP'; content: string; style: TipStyle }
 
-/** 内容风险提示条；不是拒答，不改变回答内容 */
+/** 内容风险提示条，保留原回答内容 */
 export type ContentRiskFragment = { type: 'CONTENT_RISK'; content: string; style: TipStyle }
 
 export type PartialFileReadFragment = {
@@ -100,18 +100,18 @@ export type SearchResult = {
   snippet: string
   published_at: Iso8601Utc | null
   site_name: string | null
-  /** 可选扩展：站点图标；没有此字段的 v3 产物仍可导入。 */
+  /** 可选的站点图标。 */
   site_icon?: string | null
 }
 
-/** 普通搜索与边想边搜共用，没有字段区分两者；已过滤隐藏结果 */
+/** 普通搜索与边想边搜共用的搜索片段，包含可见结果 */
 export type ToolSearchFragment = {
   type: 'TOOL_SEARCH'
   queries: string[]
   results: SearchResult[]
-  /** 旧版 v3 没有状态；FINISHED + 空结果不等于失败 */
+  /** 可选的搜索状态；FINISHED 允许空结果 */
   status?: SearchStatus
-  /** 第几轮模型推理；早期会话或不分轮次的工具可能缺省 */
+  /** 可选的模型推理轮次编号 */
   stage_id?: number
   /** 部分产物携带的分组标识，原样保留 */
   group_id?: number
@@ -136,7 +136,7 @@ export type ToolOpenFragment = {
 
 export type ToolFindStatus = 'WIP' | 'FINISHED' | 'NO_RESULT' | 'FAILED'
 
-/** 页面内查找；旧版 v3 没有查找词 */
+/** 页面内查找，查找词可选 */
 export type ToolFindFragment = {
   type: 'TOOL_FIND'
   status: ToolFindStatus
@@ -145,7 +145,7 @@ export type ToolFindFragment = {
   group_id?: number
 }
 
-/** 阅读链接结果：url/title 用于展示；旧版只有签名，正文仍需服务端解密 */
+/** 阅读链接结果：可选的 url/title 用于展示；signature 由服务端解密恢复正文 */
 export type ReadLinkResult = {
   url?: string
   title?: string | null
@@ -182,7 +182,7 @@ export type ImageSearchResult = {
   published_at: Iso8601Utc | null
 }
 
-/** 图搜：结果不含图片本身；image_indexes 只在旧版 v3 中出现 */
+/** 图搜结果元数据，支持可选的 image_indexes */
 export type ToolImageSearchFragment = {
   type: 'TOOL_IMAGE_SEARCH'
   status: ImageSearchStatus

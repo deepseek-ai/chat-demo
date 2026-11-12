@@ -59,7 +59,7 @@ const checkExtra = (bytes: Uint8Array) => {
 }
 
 const decodePath = (bytes: Uint8Array, flags: number) => {
-  // 非 UTF-8 的旧 ZIP 仅接受 ASCII，避免把文件名错误解码后匹配到另一附件。
+  // 非 UTF-8 编码的 ZIP 文件名仅接受 ASCII，确保附件路径解码准确。
   if (!(flags & 0x800) && bytes.some((byte) => byte > 0x7f)) {
     invalid()
   }

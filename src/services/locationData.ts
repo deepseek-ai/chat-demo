@@ -436,9 +436,7 @@ export const countryCodes: string[] =
   )
 
 /**
- * 港澳台的中英文名称覆盖 Intl.DisplayNames 的默认输出：
- * 浏览器中文把 TW 简写为「台湾」、把港澳写成「中国香港特别行政区」，
- * 英文则缺「, China」后缀，都不适合作为地区选项的名称。
+ * 港澳台地区选项使用固定的中英文名称。
  */
 export const countryNameOverrides: Record<'zh-CN' | 'en-US', Record<string, string>> = {
   'zh-CN': {

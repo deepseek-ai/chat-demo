@@ -11,7 +11,7 @@ import type {
 import type { ChatMessage } from './history/format.js'
 
 /**
- * 消息附件。id 只是本地标识（IndexedDB files 表的主键，原件按它存储，所有引用同一 id 的消息共用一份），
+ * 消息附件。id 是本地标识（IndexedDB files 表的主键，原件按它存储，所有引用同一 id 的消息共用一份），
  * 导入的附件沿用导出产物里的文件 ID；本地没有原件的附件只展示文件名，不进入请求。
  * serverId 是 Files API 返回的 file_id，导入的数据或尚未上传成功的文件为 null，发送前补传。
  */
@@ -30,7 +30,7 @@ export type FileAttachment = {
  */
 export type ImportedMessage = Omit<ChatMessage, 'id' | 'parent_id'>
 
-/** 分支关系只存在本地；可选字段用于兼容旧版线性历史。 */
+/** 本地消息的分支关系；字段缺省时按线性消息列表处理。 */
 type MessageBranch = {
   parentId?: string | null
   /** 当前选中的下一条消息；切换版本时保留每条分支原有的选择。 */
@@ -51,7 +51,7 @@ export type ThinkingPart = {
   type: 'thinking'
   thinking: string
   signature?: string
-  /** content_block_start 的时间；导入的原版回复没有 */
+  /** content_block_start 的时间；导入回复中缺省 */
   startedAt?: number
   /** content_block_stop（或回复结束）的时间 */
   endedAt?: number
@@ -60,7 +60,7 @@ export type ThinkingPart = {
 /** 文本块：text_delta 累积，citations_delta 追加引用 */
 export type TextPart = { type: 'text'; text: string; citations?: TextCitation[] }
 
-/** 未识别的块（如客户端工具调用），只占位以保持与流中 index 对齐 */
+/** 未识别块（如客户端工具调用）的占位，保留流中的 index */
 export type UnsupportedPart = { type: 'unsupported'; blockType: string }
 
 /** 服务端工具调用与结果块按协议原样保存；历史请求只回传 read_link 调用与结果 */
@@ -87,7 +87,7 @@ export type AssistantMessage = MessageBranch & {
   thinking?: boolean
   /** 请求时是否声明 deepseek_web_search；关闭时仍声明 deepseek_read_url；导入的回复不记录 */
   search?: boolean
-  /** 本轮请求的系统信息快照；按回答版本保存，重新生成不覆盖旧分支，续写沿用。旧历史不补写。 */
+  /** 本轮请求的系统信息快照；各回答版本独立保存，续写沿用。历史消息中缺省的快照保持为空。 */
   latestReminder?: string
   status: ReplyStatus
   /** 每次流内按 index 排列；续写产生的块追加在已有块之后 */
@@ -116,8 +116,8 @@ export type Session = {
   updatedAt: number
   /** 包含所有分支的消息，按创建顺序存储。 */
   messages: Message[]
-  /** undefined 是旧版线性历史；null 是空会话。 */
+  /** undefined 表示线性消息列表；null 表示空会话。 */
   rootMessageId?: string | null
-  /** 没有置顶功能，只保存导入的值供再次导出 */
+  /** 导入的置顶状态，供再次导出使用 */
   pinned?: boolean
 }

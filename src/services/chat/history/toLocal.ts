@@ -102,7 +102,7 @@ const unavailable: WebFetchToolResultBlock['content'] = {
 /**
  * 片段转换为本地展示块：
  * - 普通搜索与边想边搜共用 TOOL_SEARCH，以同一回复是否有打开 / 查找网页来区分；
- * - READ_LINK 用明文 URL / 标题展示，旧版只有签名的结果不展示；请求时从原文恢复签名；
+ * - READ_LINK 用明文 URL / 标题展示，仅含签名的结果用于请求上下文；请求时从原文恢复签名；
  * - 没有链接的 TOOL_OPEN 不展示；
  * - 没有对应展示的片段记为不支持，回复下方提示部分内容无法展示。
  */

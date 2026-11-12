@@ -45,11 +45,11 @@ export const MermaidDiagram = memo(function MermaidDiagram({
         } catch {
           if (!cancelled) {
             if (loading) {
-              // 新片段常停在半个节点中；暂缓末行，先画前面完整的行，不补写语法。
+              // 流式片段的末行可能包含未完成的节点，仅绘制前面的完整行。
               const text = input.trimEnd()
               const lineEnd = Math.max(text.lastIndexOf('\n'), text.lastIndexOf('\r'))
               const prefix = text.slice(0, Math.max(0, lineEnd))
-              // 已显示的合法片段可能更长，不让节点因末行暂缓而回退。
+              // 已显示的内容覆盖当前前缀时保持图形。
               if (prefix && !displayedCode?.startsWith(prefix)) {
                 try {
                   await draw(prefix)
@@ -63,7 +63,7 @@ export const MermaidDiagram = memo(function MermaidDiagram({
           }
         }
       }
-      // 当前帧结束后再取最新片段，既不丢弃成功帧，也不积压中间任务。
+      // 当前帧结束后绘制最新片段，连续输入合并为一次绘制。
       if (!cancelled && loading) {
         timer = setTimeout(renderLatest, 100)
       }

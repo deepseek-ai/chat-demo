@@ -14,7 +14,7 @@ export type TextCitation = {
   url: string
   /** 查不到标题时为 null */
   title: string | null
-  /** 当前文本块截至该引用处的全部正文（去除首尾空白），不是来源原文 */
+  /** 当前文本块截至该引用处的全部正文（去除首尾空白） */
   cited_text: string
   /** 恒为空串 */
   encrypted_index: string
@@ -26,7 +26,7 @@ export type TextBlock = { type: 'text'; text: string; citations?: TextCitation[]
 /** 思考块：签名在块结束前经 signature_delta 下发，值为本次响应的消息 id */
 export type ThinkingBlock = { type: 'thinking'; thinking: string; signature: string }
 
-/** 服务端识别调用所属联网能力用的 kind；image_search 暂未开放输出 */
+/** 服务端识别调用所属联网能力用的 kind；输出支持 search / deep_search / read_link */
 export type ServerToolKind = 'search' | 'deep_search' | 'read_link' | 'image_search'
 
 /** server_tool_use 的四种动作，input 结构由 action 决定 */
@@ -111,7 +111,7 @@ export type ServerToolBlock =
   | WebSearchToolResultBlock
   | WebFetchToolResultBlock
 
-/** 客户端工具调用块：本应用不声明客户端工具，不会出现，只用于识别 */
+/** 用于识别客户端工具调用的内容块类型 */
 export type ToolUseBlock = { type: 'tool_use'; id: string; name: string; input: unknown }
 
 // ---------- 请求 ----------
