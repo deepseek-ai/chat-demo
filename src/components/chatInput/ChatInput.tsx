@@ -262,6 +262,7 @@ export const ChatInput = ({
         <div className={styles.right}>
           <VoiceButton
             status={voice.status}
+            disabled={!voice.available}
             getLevel={voice.getLevel}
             onClick={() => ensureApiKey() && void voice.toggle()}
           />

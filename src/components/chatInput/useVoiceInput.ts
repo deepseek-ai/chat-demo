@@ -8,6 +8,12 @@ import { showToast } from '../base/toastState.js'
 
 export type VoiceInputStatus = 'idle' | 'recording' | 'transcribing'
 
+/**
+ * 录音依赖 getUserMedia，只在安全上下文可用（HTTPS、localhost、file://）。
+ * 普通 HTTP 页面上直接禁用入口，避免点击后必然失败。
+ */
+const AVAILABLE = typeof window === 'undefined' || window.isSecureContext
+
 const describeError = (error: unknown): TranslationMessage => {
   if (error instanceof DOMException) {
     if (error.name === 'NotAllowedError' || error.name === 'SecurityError') {
@@ -76,6 +82,9 @@ export const useVoiceInput = (onText: (text: string) => void) => {
   }, [])
 
   const toggle = useCallback(async () => {
+    if (!AVAILABLE) {
+      return
+    }
     if (status === 'recording') {
       await finish()
       return
@@ -109,5 +118,5 @@ export const useVoiceInput = (onText: (text: string) => void) => {
   /** 录音中的实时音量（0–1），未录音时为 0 */
   const getLevel = useCallback(() => recordingRef.current?.getLevel() ?? 0, [])
 
-  return { status, toggle, getLevel }
+  return { status, toggle, getLevel, available: AVAILABLE }
 }

@@ -13,10 +13,13 @@ import styles from './VoiceButton.module.css'
  */
 export const VoiceButton = ({
   status,
+  disabled = false,
   getLevel,
   onClick,
 }: {
   status: VoiceInputStatus
+  /** 当前页面无法录音（非安全上下文）时置灰，tooltip 改为提示需要 HTTPS */
+  disabled?: boolean
   getLevel: () => number
   onClick: () => void
 }) => {
@@ -42,20 +45,27 @@ export const VoiceButton = ({
     return () => cancelAnimationFrame(frame)
   }, [recording, getLevel])
 
-  const label = recording
-    ? t('voiceInputStop')
-    : status === 'transcribing'
-      ? t('voiceInputCancel')
-      : t('voiceInput')
+  const label = disabled
+    ? t('voiceInputRequiresHttps')
+    : recording
+      ? t('voiceInputStop')
+      : status === 'transcribing'
+        ? t('voiceInputCancel')
+        : t('voiceInput')
 
   return (
     <Tooltip content={label}>
       <button
         type="button"
-        className={clsx(styles.button, recording && styles.recording)}
+        className={clsx(styles.button, recording && styles.recording, disabled && styles.disabled)}
         aria-label={label}
         aria-pressed={recording}
-        onClick={onClick}
+        aria-disabled={disabled}
+        onClick={() => {
+          if (!disabled) {
+            onClick()
+          }
+        }}
       >
         {recording ? (
           <span className={styles.active}>
