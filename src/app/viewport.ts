@@ -33,6 +33,8 @@ export const useMobileViewport = (enabled: boolean) => {
       frame.style.setProperty('--app-viewport-top', `${viewport?.offsetTop ?? 0}px`)
     }
     const schedule = () => {
+      // 先同步跟上键盘动画，下一帧再校准 Safari 延迟更新的视口读数。
+      update()
       cancelAnimationFrame(animationFrame)
       animationFrame = requestAnimationFrame(update)
     }
