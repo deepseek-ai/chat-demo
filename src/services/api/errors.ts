@@ -53,3 +53,29 @@ export const isRetryableApiError = (error: unknown): boolean => {
     condition === 'serverBusy'
   )
 }
+
+/** 服务端判定附件失效的情况：本地有原件时重新上传即可自愈 */
+export type FileErrorCode = 'fileIdMissing' | 'fileDataMissing' | 'invalidFileId'
+
+/** 400 只带 message 文本，按文案前缀区分；顺序无关，互不重叠 */
+const FILE_ERROR_PATTERNS: ReadonlyArray<readonly [FileErrorCode, RegExp]> = [
+  ['fileIdMissing', /file_ids do not exist or are not created under your account/i],
+  ['fileDataMissing', /file data not found for file_id/i],
+  ['invalidFileId', /\.source\.file_id: invalid file_id/i],
+]
+
+/**
+ * 只识别「附件 file_id 失效」这一类 400：服务端查不到文件、文件数据丢失、file_id 格式非法。
+ * 其余错误（限流、余额、purpose 不合规等）不在这里处理，保持原有失败提示。
+ */
+export const getFileErrorCode = (error: unknown): FileErrorCode | null => {
+  if (!(error instanceof ApiError) || error.status !== 400) {
+    return null
+  }
+  return FILE_ERROR_PATTERNS.find(([, pattern]) => pattern.test(error.message))?.[0] ?? null
+}
+
+/** 从报错文案里取出服务端 file_id，用于只重置真正失效的附件 */
+export const extractFileIds = (message: string): string[] => [
+  ...new Set(message.match(/file-api-[\w-]+/g) ?? []),
+]
