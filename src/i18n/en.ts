@@ -120,7 +120,7 @@ export const en = {
   historyImportedOne: 'Imported 1 chat',
   historyImported: 'Imported {count} chats',
   historyImportFailed:
-    'Import failed. The file may be in an unsupported format or corrupted. Please export your chat history from DeepSeek and try importing again.',
+    'File import failed. The file format may be invalid, or the ZIP file may use an older chat export format. Please export your chat history from DeepSeek again and retry the import.',
   historyExportFailed: 'Export failed: {message}',
   exportAllLabel: 'Export all chats',
   historyExportDescription:
